@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Blink
+  - SidWeapon
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - Ground
+  - OneWayPlatform
+  - Ladder
+  - Character
+  - 
+  - Interactable
+  - Edge
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Background
+    uniqueID: 876178951
+    locked: 0
+  - name: Ground
+    uniqueID: 1289289347
+    locked: 0
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Object
+    uniqueID: 2991040815
+    locked: 0
+  - name: Foreground
+    uniqueID: 256887013
+    locked: 0
+  - name: UI
+    uniqueID: 671517781
+    locked: 0
