@@ -5,9 +5,10 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerInputController : MonoBehaviour
 {
+    public Vector2 Axis;
+
     private InputMaster _controls;
     private CharacterController _character;
-    private Vector2 _axis;
 
     void Awake()
     {
@@ -21,7 +22,7 @@ public class PlayerInputController : MonoBehaviour
         _controls.Player.Jump.canceled += EndJump;
         _controls.Player.Jump.started += Glide;
         _controls.Player.Jump.canceled += EndGlide;
-        _controls.Player.Dash.started += Dash;
+        _controls.Player.Dash.started += Slide;
         _controls.Player.Fly.started += Fly;
         _controls.Player.Fly.canceled += EndFly;
         #endregion
@@ -39,20 +40,20 @@ public class PlayerInputController : MonoBehaviour
 
     void FixedUpdate()
     {
-        _character.Walk(_axis.x);
-        _character.ClimbLadder(_axis.y);
-        _character.StickToEdge(_axis.y);
+        _character.Walk(Axis.x);
+        _character.ClimbLadder(Axis.y);
+        _character.StickToEdge(Axis.y);
     }
 
     private void Move(Vector2 _axis)
     {
-        this._axis = _axis;
+        this.Axis = _axis;
     }
 
     #region Jump
     private void Jump(InputAction.CallbackContext context)
     {
-        if (_axis.y < 0)
+        if (Axis.y < 0)
         {
             _character.JumpDown();
         }
@@ -83,7 +84,14 @@ public class PlayerInputController : MonoBehaviour
     #region Dash
     private void Dash(InputAction.CallbackContext context)
     {
-        _character.Dash(_axis);
+        _character.Dash(Axis);
+    }
+    #endregion
+
+    #region Slide
+    private void Slide(InputAction.CallbackContext context)
+    {
+        _character.StartSlide();
     }
     #endregion
 

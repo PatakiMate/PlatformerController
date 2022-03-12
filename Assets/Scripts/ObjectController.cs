@@ -6,7 +6,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class ObjectController : MonoBehaviour
 {
-    public bool FacingRight { get; set; }
+    public bool FacingRight;
     public bool IgnoreFriction { get; set; }
     public Vector2 TotalSpeed => Speed + ExternalForce;
     [Header("Collision Parameters")]
@@ -120,6 +120,7 @@ public class ObjectController : MonoBehaviour
 
     public virtual Vector2 Move(Vector2 deltaMove)
     {
+      
         int layer = gameObject.layer;
         gameObject.layer = Physics2D.IgnoreRaycastLayer;
         PreMove(ref deltaMove);

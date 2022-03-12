@@ -10,9 +10,11 @@ public class CharacterData : MonoBehaviour
     public float AccelerationTime;
     public float DecelerationTime;
     public bool CanUseSlopes;
+    public float GlideGravity;
     [Header("Jumping")]
     public int MaxExtraJumps;
     public float MaxJumpHeight;
+    public float JumpOutHeight;
     public float MinJumpHeight;
     public bool AdvancedAirControl;
     public float AirAccelerationTime;
@@ -24,6 +26,7 @@ public class CharacterData : MonoBehaviour
     public float WallSlideSpeed;
     public bool CanWallJump;
     public float WallJumpSpeed;
+    public float WallJumpBlockTime;
     [Header("Dashing")]
     public bool CanDash;
     public bool OmnidirectionalDash;
@@ -35,6 +38,10 @@ public class CharacterData : MonoBehaviour
     public float DashStagger;
     public float MaxDashCooldown;
     public int MaxAirDashes;
+    [Header("Sliding")]
+    public float SlideTime;
+    public float SlideStopSpeed;
+    public float SlideMaxSpeed;
     [Header("Ladders")]
     public float LadderSpeed;
     public float LadderAccelerationTime;

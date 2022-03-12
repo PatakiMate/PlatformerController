@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterData))]
+[RequireComponent(typeof(PlayerInputController))]
 public class CharacterController : ObjectController
 {
     public bool OnLadder { get; set; }
@@ -11,22 +12,29 @@ public class CharacterController : ObjectController
     public bool Dashing { get; set; }
     public bool Flying { get; set; }
     public bool Gliding { get; set; }
+    public bool Sliding { get; set; }
     public SpriteRenderer Visual;
 
     private CharacterData _cData;
+    private PlayerInputController _pController;
+    private Transform _currentEdge;
+    private bool _slideNeed;
     private float _ignoreLaddersTime = 0;
     private float _ignoreEdgesTime = 0;
     private int _extraJumps = 0;
     private int _airDashes = 0;
     private float _dashCooldown = 0;
+    private float _slideTime = 0;
     private float _airStaggerTime = 0;
     private float _ladderX = 0;
+    private float _wallJumpBlock;
     private float _coyoteTime = 0;
     private float _jumpBufferTime = 0;
 
     public override void Start()
     {
         _cData = GetComponent<CharacterData>();
+        _pController = GetComponent<PlayerInputController>();
         OnLadder = false;
         OnEdge = false;
         Dashing = false;
@@ -39,6 +47,7 @@ public class CharacterController : ObjectController
         Collisions.Reset();
         Move((TotalSpeed) * Time.fixedDeltaTime);
         PostMove();
+        Slide();
     }
 
     #region Handle Physics Forces
@@ -62,9 +71,14 @@ public class CharacterController : ObjectController
     #region Movement
     public override Vector2 Move(Vector2 deltaMove)
     {
+        if (TotalSpeed.x != 0)
+        {
+            FacingRight = TotalSpeed.x > 0;
+        }
         if (Gliding && TotalSpeed.y < 0)
         {
-            GravityScale = 0.05f;
+           
+            GravityScale = _cData.GlideGravity;
         }
         else
         {
@@ -83,7 +97,7 @@ public class CharacterController : ObjectController
                 {
                     if (Collisions.groundDirection == xDir)
                     {
-                        if ((!Dashing && _airStaggerTime <= 0) || _cData.DashDownSlopes)
+                        if (!Sliding || (!Dashing && _airStaggerTime <= 0) || _cData.DashDownSlopes)
                         {
                             DescendSlope(ref deltaMove);
                         }
@@ -154,15 +168,19 @@ public class CharacterController : ObjectController
         {
             direction = 0;
         }
-        if (CanMove() && !Dashing && _airStaggerTime <= 0)
+        if (CanMove() && !Dashing && !Sliding && _airStaggerTime <= 0)
         {
-            if (OnLadder || OnEdge)
+            if (OnLadder)
             {
                 if (direction != 0)
                 {
                     FacingRight = direction > 0;
                     if (Visual) Visual.flipX = !FacingRight;
                 }
+                return;
+            }
+            if(OnEdge)
+            {
                 return;
             }
             float acc = 0f;
@@ -329,7 +347,12 @@ public class CharacterController : ObjectController
 
     public bool CanMove()
     {
-        return true;
+        if (_wallJumpBlock <= 0)
+        {
+            return true;
+        } else {
+            return false;
+        }
     }
     #endregion
 
@@ -341,7 +364,7 @@ public class CharacterController : ObjectController
     }
     public IEnumerator JumpMethod()
     {
-        if (CanMove() && (!Dashing || _cData.CanJumpDuringDash))
+        if (CanMove() && (!Dashing || _cData.CanJumpDuringDash) && Sliding == false)
         {
             _jumpBufferTime = _cData.JumpBufferTime;
             if (Collisions.onGround == false && _extraJumps == 0)
@@ -352,7 +375,7 @@ public class CharacterController : ObjectController
                     yield return new WaitForEndOfFrame();
                 }
             }
-            if (Collisions.onGround || _coyoteTime > 0 || _extraJumps > 0 || (_cData.CanWallJump && Collisions.hHit))
+            if (Collisions.onGround || _coyoteTime > 0 || _extraJumps > 0 || (_cData.CanWallJump && Collisions.hHit) || OnEdge)
             {
                 UpdateCoyoteTimer = false;
                 // air jump
@@ -384,23 +407,13 @@ public class CharacterController : ObjectController
                 }
                 if (OnEdge)
                 {
-                    Vector2 origin = MyCollider.bounds.center + Vector3.up * MyCollider.bounds.extents.y;
-                    Collider2D hit = Physics2D.OverlapCircle(origin, 0, CollisionMask);
-                    if (hit)
-                    {
-                        yield return null;
-                    }
-                    origin = MyCollider.bounds.center + Vector3.down * MyCollider.bounds.extents.y;
-                    hit = Physics2D.OverlapCircle(origin, 0, CollisionMask);
-                    if (hit)
-                    {
-                        yield return null;
-                    }
-                    height = _cData.LadderJumpHeight;
-                    ExternalForce.x += _cData.LadderJumpSpeed * (FacingRight ? 1 : -1);
                     OnEdge = false;
                     IgnoreEdges();
+                    Vector2 origin = _currentEdge.position;
+                    RaycastHit2D hitLeft = Physics2D.Raycast(origin, Vector2.left * 10, 1f, CollisionMask);
+                    ExternalForce.x += hitLeft ? _cData.WallJumpSpeed : -_cData.WallJumpSpeed;
                     ResetJumpsAndDashes();
+                    _wallJumpBlock = _cData.WallJumpBlockTime;
                 }
                 Speed.y = Mathf.Sqrt(-2 * PConfig.Gravity * height);
                 ExternalForce.y = 0;
@@ -413,6 +426,7 @@ public class CharacterController : ObjectController
                 {
                     ExternalForce.x += Collisions.left ? _cData.WallJumpSpeed : -_cData.WallJumpSpeed;
                     ResetJumpsAndDashes();
+                    _wallJumpBlock = _cData.WallJumpBlockTime;
                 }
                 //slope sliding jump
                 if (Collisions.onSlope && Collisions.groundAngle > MaxSlopeAngle &&
@@ -420,6 +434,22 @@ public class CharacterController : ObjectController
                 {
                     Speed.x = _cData.MaxSpeed * Collisions.groundDirection;
                 }
+                IgnorePlatformsTime = 0;
+            }
+        }
+    }
+    public void JumpOut()
+    {
+        if (CanMove() && (!Dashing || _cData.CanJumpDuringDash) && Sliding == false)
+        {
+            if (OnEdge)
+            {
+                float height = _cData.JumpOutHeight;
+
+                OnEdge = false;
+                IgnoreEdges();
+                Speed.y = Mathf.Sqrt(-2 * PConfig.Gravity * height);
+                ExternalForce.y = 0;
                 IgnorePlatformsTime = 0;
             }
         }
@@ -438,8 +468,7 @@ public class CharacterController : ObjectController
     {
         if (CanMove())
         {
-            if (Collisions.vHit && PConfig.OneWayPlatformMask ==
-                (PConfig.OneWayPlatformMask | (1 << Collisions.vHit.collider.gameObject.layer)))
+            if (Collisions.vHit && PConfig.OneWayPlatformMask ==(PConfig.OneWayPlatformMask | (1 << Collisions.vHit.collider.gameObject.layer)))
             {
                 IgnorePlatforms();
             }
@@ -456,6 +485,8 @@ public class CharacterController : ObjectController
     {
         if (TotalSpeed.y < 0 || Flying)
         {
+            Speed.y = 0;
+            ExternalForce.y = 0;
             Gliding = true;
         }
     }
@@ -518,24 +549,68 @@ public class CharacterController : ObjectController
             ExternalForce = direction;
             _dashCooldown = _cData.MaxDashCooldown;
             _airStaggerTime = _cData.DashStagger;
-            Invoke("StopDash", _cData.DashDistance / _cData.DashSpeed);
+            StartCoroutine(EndDash());
+            //Invoke("StopDash", _cData.DashDistance / _cData.DashSpeed);
         }
     }
 
-    private void StopDash()
+    private IEnumerator EndDash()
     {
+        yield return new WaitForSecondsRealtime(_cData.DashDistance / _cData.DashSpeed);
+        yield return new WaitForSecondsRealtime(1f);
         Dashing = false;
+    }
+    #endregion
+
+    #region Slide
+    public void StartSlide()
+    {
+        if (CanMove() && Collisions.onGround && !OnLadder)
+        {
+            _slideNeed = true;
+        }
+    }
+
+    public void Slide()
+    {
+        if (!_slideNeed)
+        {
+            _slideTime = _cData.SlideTime;
+            return;
+        }
+        if (_slideNeed)
+        {
+            if (Sliding == false)
+            {
+                Speed.x = _cData.SlideMaxSpeed * (FacingRight ? 1 : -1);
+                Sliding = true;
+            }
+        }
+        if (_slideTime <= 0)
+        {
+            Speed.x = 0;
+            Sliding = false;
+            _slideNeed = false;
+        }
+
+        if (Collisions.hHit)
+        {
+            Speed.x = 0;
+            Sliding = false;
+            _slideNeed = false;
+        }
+        Speed.x = Mathf.MoveTowards(Speed.x, _cData.SlideStopSpeed, (1 / _cData.SlideTime) * _cData.SlideMaxSpeed * Time.fixedDeltaTime);
     }
     #endregion
 
     #region Fly
     public void Fly()
     {
-        Speed.y = 10;
+        Speed.y = Mathf.Sqrt(-2 * PConfig.Gravity * 2);
     }
     public void EndFly()
     {
-        Speed.y = 0;
+        //Speed.y = 0;
     }
     #endregion
 
@@ -618,7 +693,7 @@ public class CharacterController : ObjectController
     #region Edge Hold
     public void StickToEdge(float direction)
     {
-        if (_ignoreEdgesTime > 0 || Dashing)
+        if (_ignoreEdgesTime > 0 || Dashing || Sliding)
         {
             return;
         }
@@ -630,12 +705,16 @@ public class CharacterController : ObjectController
         {
             if (OnEdge == false)
             {
+                _currentEdge = hit.transform;
                 OnEdge = true;
                 Speed.x = 0;
                 Vector3 height = new Vector3(0, MyCollider.bounds.extents.y * 2 - hit.bounds.extents.y, 0);
                 transform.DOMove(hit.transform.position - height, 0.15f);
                 ExternalForce = Vector2.zero;
             }
+        } else
+        {
+            _currentEdge = null;
         }
         if (OnEdge)
         {
@@ -643,6 +722,15 @@ public class CharacterController : ObjectController
             if (Mathf.Abs(Speed.y) > 0)
             {
                 Speed.y = 0;
+            }
+            if(direction == -1)
+            {
+                IgnoreEdges();
+                OnEdge = false;
+            }
+            if(direction == 1)
+            {
+                JumpOut();
             }
         }
     }
@@ -668,6 +756,18 @@ public class CharacterController : ObjectController
         {
             _ignoreEdgesTime -= Time.fixedDeltaTime;
         }
+        if (_slideTime > 0)
+        {
+            _slideTime -= Time.fixedDeltaTime;
+        }
+        if(_wallJumpBlock > 0)
+        {
+            _wallJumpBlock -= Time.fixedDeltaTime;
+        }
+        //if (_slideTiming > _cData.SlideTime)
+        //{
+        //    _slideTiming = 0;
+        //}
         if (UpdateCoyoteTimer)
         {
             _coyoteTime += Time.fixedDeltaTime;
@@ -677,7 +777,7 @@ public class CharacterController : ObjectController
             _coyoteTime = 0;
             UpdateCoyoteTimer = false;
         }
-        if (_airStaggerTime > 0 && !Dashing)
+        if (_airStaggerTime > 0 && !Dashing && !Sliding)
         {
             _airStaggerTime -= Time.fixedDeltaTime;
             //ExternalForce = Vector2.MoveTowards(ExternalForce, Vector2.zero, PConfig.StaggerSpeedFalloff * Time.fixedDeltaTime);
