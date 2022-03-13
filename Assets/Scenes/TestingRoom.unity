@@ -4937,6 +4937,7 @@ MonoBehaviour:
   WallSlideSpeed: 0
   CanWallJump: 1
   WallJumpSpeed: 5
+  WallWalkingSpeed: 5
   WallJumpBlockTime: 0.3
   CanDash: 1
   OmnidirectionalDash: 0
@@ -4977,7 +4978,9 @@ MonoBehaviour:
   EdgeDelay: 0.3
   MaxSlopeAngle: 60
   MinWallAngle: 80
+  Speed: {x: 0, y: 0}
   Visual: {fileID: 1631629347}
+  _wallWalking: 0
 --- !u!61 &750745537710206570
 BoxCollider2D:
   m_ObjectHideFlags: 0

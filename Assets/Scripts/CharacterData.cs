@@ -26,6 +26,7 @@ public class CharacterData : MonoBehaviour
     public float WallSlideSpeed;
     public bool CanWallJump;
     public float WallJumpSpeed;
+    public float WallWalkingSpeed;
     public float WallJumpBlockTime;
     [Header("Dashing")]
     public bool CanDash;

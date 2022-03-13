@@ -18,7 +18,8 @@ public class CharacterController : ObjectController
     private CharacterData _cData;
     private PlayerInputController _pController;
     private Transform _currentEdge;
-    private bool _slideNeed;
+    private bool _slideNeed = false;
+    public bool _wallWalking = false;
     private float _ignoreLaddersTime = 0;
     private float _ignoreEdgesTime = 0;
     private int _extraJumps = 0;
@@ -53,7 +54,7 @@ public class CharacterController : ObjectController
     #region Handle Physics Forces
     protected override void UpdateGravity()
     {
-        if (!OnLadder && !OnEdge && !Dashing && _airStaggerTime <= 0)
+        if (!OnLadder && !OnEdge && !Dashing && _airStaggerTime <= 0 && !_wallWalking)
         {
             base.UpdateGravity();
         }
@@ -113,16 +114,26 @@ public class CharacterController : ObjectController
         if (Collisions.hHit && _cData.CanWallSlide && TotalSpeed.y <= 0)
         {
             ExternalForce.y = 0;
-            Speed.y = -_cData.WallSlideSpeed;
+            //Speed.y = -_cData.WallSlideSpeed;
+            //GravityScale = 0;
+            _wallWalking = true;
         }
-        if (Collisions.onSlope && Collisions.groundAngle >= MinWallAngle &&
-            Collisions.groundDirection != xDir && Speed.y < 0)
+        if(_wallWalking)
+        {
+            Speed.y = Mathf.RoundToInt(_pController.Axis.y) * _cData.WallWalkingSpeed;
+        }
+        if (Collisions.hHit == false  || !_cData.CanWallSlide)
+        {
+            _wallWalking = false;
+        }
+        if (Collisions.onSlope && Collisions.groundAngle >= MinWallAngle &&Collisions.groundDirection != xDir && Speed.y < 0)
         {
             float sin = Mathf.Sin(Collisions.groundAngle * Mathf.Deg2Rad);
             float cos = Mathf.Cos(Collisions.groundAngle * Mathf.Deg2Rad);
             deltaMove.x = cos * _cData.WallSlideSpeed * Time.fixedDeltaTime * Collisions.groundDirection;
             deltaMove.y = sin * -_cData.WallSlideSpeed * Time.fixedDeltaTime;
-            Speed.y = -_cData.WallSlideSpeed;
+            //Speed.y = -_cData.WallSlideSpeed;
+            Speed.y = Mathf.RoundToInt(_pController.Axis.y) * 10;
             Speed.x = 0;
             Vector2 origin = Collisions.groundDirection == -1 ? RayOrigins.bottomRight : RayOrigins.bottomRight;
             Collisions.hHit = Physics2D.Raycast(origin, Vector2.left * Collisions.groundDirection,
@@ -375,7 +386,7 @@ public class CharacterController : ObjectController
                     yield return new WaitForEndOfFrame();
                 }
             }
-            if (Collisions.onGround || _coyoteTime > 0 || _extraJumps > 0 || (_cData.CanWallJump && Collisions.hHit) || OnEdge)
+            if (Collisions.onGround || _coyoteTime > 0 || _extraJumps > 0 || (_cData.CanWallJump && Collisions.hHit) || OnEdge || OnLadder)
             {
                 UpdateCoyoteTimer = false;
                 // air jump
@@ -708,8 +719,8 @@ public class CharacterController : ObjectController
                 _currentEdge = hit.transform;
                 OnEdge = true;
                 Speed.x = 0;
-                Vector3 height = new Vector3(0, MyCollider.bounds.extents.y * 2 - hit.bounds.extents.y, 0);
-                transform.DOMove(hit.transform.position - height, 0.15f);
+                //Vector3 height = new Vector3(0, MyCollider.bounds.extents.y * 2 - hit.bounds.extents.y, 0);
+                //transform.DOMove(hit.transform.position - height, 0.15f);
                 ExternalForce = Vector2.zero;
             }
         } else
@@ -718,6 +729,8 @@ public class CharacterController : ObjectController
         }
         if (OnEdge)
         {
+            Vector3 height = new Vector3(0, MyCollider.bounds.extents.y * 2 - hit.bounds.extents.y, 0);
+            transform.position = hit.transform.position - height;
             ResetJumpsAndDashes();
             if (Mathf.Abs(Speed.y) > 0)
             {

@@ -23,6 +23,7 @@ public class ObjectController : MonoBehaviour
     protected CollisionInfo Collisions;
     protected BoxCollider2D MyCollider;
     protected PhysicsConfig PConfig;
+    [SerializeField]
     protected Vector2 Speed = Vector2.zero;
     protected Vector2 ExternalForce = Vector2.zero;
     protected float HorizontalRaySpacing;
