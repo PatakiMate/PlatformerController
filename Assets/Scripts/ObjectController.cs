@@ -25,6 +25,7 @@ public class ObjectController : MonoBehaviour
     protected PhysicsConfig PConfig;
     [SerializeField]
     protected Vector2 Speed = Vector2.zero;
+    [SerializeField]
     protected Vector2 ExternalForce = Vector2.zero;
     protected float HorizontalRaySpacing;
     protected float HorizontalRayCount;

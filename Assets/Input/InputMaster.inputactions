@@ -58,6 +58,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "Aim",
+                    "type": "Value",
+                    "id": "efab4215-948c-4e26-8033-3e59fb3fcbf2",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -390,6 +399,61 @@
                     "action": "Fly",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "rightStick",
+                    "id": "fedf5e7e-7d24-449e-87cf-34ea537dda5a",
+                    "path": "2DVector(normalize=false,mode=2)",
+                    "interactions": "",
+                    "processors": "AxisDeadzone(min=0.125,max=0.925)",
+                    "groups": "",
+                    "action": "Aim",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "f5f5238b-9cf6-4514-9d4f-ab2b7d46adfc",
+                    "path": "<Gamepad>/rightStick/up",
+                    "interactions": "",
+                    "processors": "StickDeadzone,AxisDeadzone",
+                    "groups": ";Gamepad",
+                    "action": "Aim",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "0fd54d82-0df7-4458-9737-ddf50f46cb45",
+                    "path": "<Gamepad>/rightStick/down",
+                    "interactions": "",
+                    "processors": "StickDeadzone,AxisDeadzone",
+                    "groups": ";Gamepad",
+                    "action": "Aim",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "5c4b0f44-a613-491a-818c-3bf34de8cde6",
+                    "path": "<Gamepad>/rightStick/left",
+                    "interactions": "",
+                    "processors": "StickDeadzone,AxisDeadzone",
+                    "groups": ";Gamepad",
+                    "action": "Aim",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "3a8ddf1f-34db-4c70-86e6-bbd90cfd7e58",
+                    "path": "<Gamepad>/rightStick/right",
+                    "interactions": "",
+                    "processors": "StickDeadzone,AxisDeadzone",
+                    "groups": ";Gamepad",
+                    "action": "Aim",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 }
             ]
         }

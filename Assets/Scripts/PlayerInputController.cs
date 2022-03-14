@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 public class PlayerInputController : MonoBehaviour
 {
     public Vector2 Axis;
+    public Vector2 AimAxis;
 
     private InputMaster _controls;
     private CharacterController _character;
@@ -18,6 +19,8 @@ public class PlayerInputController : MonoBehaviour
         _controls = new InputMaster();
         _controls.Player.Movement.performed += ctx => Move(ctx.ReadValue<Vector2>());
         _controls.Player.Movement.canceled += ctx => Move(Vector2.zero);
+        _controls.Player.Aim.performed += ctx => Aim(ctx.ReadValue<Vector2>());
+        _controls.Player.Aim.canceled += ctx => Aim(Vector2.zero);
         _controls.Player.Jump.started += Jump;
         _controls.Player.Jump.canceled += EndJump;
         _controls.Player.Jump.started += Glide;
@@ -45,9 +48,9 @@ public class PlayerInputController : MonoBehaviour
         _character.StickToEdge(Axis.y);
     }
 
-    private void Move(Vector2 _axis)
+    private void Move(Vector2 axis)
     {
-        this.Axis = _axis;
+        this.Axis = axis;
     }
 
     #region Jump
@@ -107,4 +110,9 @@ public class PlayerInputController : MonoBehaviour
         _character.EndFly();
     }
     #endregion
+
+    public void Aim(Vector2 axis)
+    {
+        AimAxis = axis;
+    }
 }

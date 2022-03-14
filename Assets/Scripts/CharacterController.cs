@@ -111,7 +111,7 @@ public class CharacterController : ObjectController
             }
             HorizontalCollisions(ref deltaMove);
         }
-        if (Collisions.hHit && _cData.CanWallSlide && TotalSpeed.y <= 0)
+        if (Collisions.hHit && _cData.CanWallSlide && TotalSpeed.y < 0 && Collisions.onGround == false)
         {
             ExternalForce.y = 0;
             //Speed.y = -_cData.WallSlideSpeed;
