@@ -435,6 +435,7 @@ public class CharacterController : ObjectController
                 // wall jump
                 if (_cData.CanWallJump && Collisions.hHit && !Collisions.below)
                 {
+                    _wallWalking = false;
                     ExternalForce.x += Collisions.left ? _cData.WallJumpSpeed : -_cData.WallJumpSpeed;
                     ResetJumpsAndDashes();
                     _wallJumpBlock = _cData.WallJumpBlockTime;
@@ -729,8 +730,11 @@ public class CharacterController : ObjectController
         }
         if (OnEdge)
         {
-            Vector3 height = new Vector3(0, MyCollider.bounds.extents.y * 2 - hit.bounds.extents.y, 0);
-            transform.position = hit.transform.position - height;
+            if (hit)
+            {
+                Vector3 height = new Vector3(0, MyCollider.bounds.extents.y * 2 - hit.bounds.extents.y, 0);
+                transform.position = hit.transform.position - height;
+            }
             ResetJumpsAndDashes();
             if (Mathf.Abs(Speed.y) > 0)
             {
@@ -743,7 +747,17 @@ public class CharacterController : ObjectController
             }
             if(direction == 1)
             {
-                JumpOut();
+                Vector2 topPosition = _currentEdge.GetComponent<EdgeController>().TopPoint.position;
+                Vector2 targetPosition = new Vector2(topPosition.x, topPosition.y - MyCollider.bounds.extents.y / 2);
+                Tween t = transform.DOMove(targetPosition, 0.25f);
+                t.OnComplete(() =>
+                {
+                    OnEdge = false;
+                    _currentEdge = null;
+                });
+               
+                //transform.position = _currentEdge.GetComponent<EdgeController>().TopPoint.position;
+                //JumpOut();
             }
         }
     }
