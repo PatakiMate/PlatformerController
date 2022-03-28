@@ -16,6 +16,7 @@ public class CharacterController : ObjectController
     public SpriteRenderer Visual;
 
     private CharacterData _cData;
+    private Animator _animator;
     private PlayerInputController _pController;
     private Transform _currentEdge;
     private bool _slideNeed = false;
@@ -32,9 +33,27 @@ public class CharacterController : ObjectController
     private float _coyoteTime = 0;
     private float _jumpBufferTime = 0;
 
+    //Animator variables
+
+    private bool _idle;
+    private bool _run;
+    private bool _jump;
+    private bool _crouch;
+    private bool _isFlying;
+    private bool _isFalling;
+    private bool _climbLadder;
+    private bool _climbWall;
+    private bool _onWall;
+    private bool _onLadder;
+    private bool _onGround;
+    private bool _isMoving;
+    private bool _isFloating;
+    private bool _climbEdge;
+
     public override void Start()
     {
         _cData = GetComponent<CharacterData>();
+        _animator = GetComponent<Animator>();
         _pController = GetComponent<PlayerInputController>();
         OnLadder = false;
         OnEdge = false;
@@ -49,6 +68,38 @@ public class CharacterController : ObjectController
         Move((TotalSpeed) * Time.fixedDeltaTime);
         PostMove();
         Slide();
+        UpdateAnimatorValues();
+    }
+
+    public void UpdateAnimatorValues()
+    {
+        _animator.SetBool("idle", _idle);
+        _animator.SetBool("run", _run);
+        //_animator.SetBool("jump", _jump);
+        _animator.SetBool("crouch", _crouch);
+        _animator.SetBool("isFlying", Flying);
+        _animator.SetBool("climbLadder", _climbLadder);
+        _animator.SetBool("climbWall", _climbWall);
+        _animator.SetBool("onWall", _wallWalking);
+        _animator.SetBool("onLadder", OnLadder);
+        _animator.SetBool("onGround", Collisions.onGround);
+        _animator.SetBool("onEdge", OnEdge);
+        _animator.SetBool("isMoving", _isMoving);
+        _animator.SetBool("isFalling", _isFalling);
+        _animator.SetBool("isFloating", _isFloating);
+        _animator.SetBool("climbEdge", _climbEdge);
+    }
+    public void SetAnimatorIdle()
+    {
+        _idle = false;
+        _run = false;
+        _jump = false;
+        _crouch = false;
+        _isFlying = false;
+        _isFalling = false;
+        _isFloating = false;
+        _climbLadder = false;
+        _climbWall = false;
     }
 
     #region Handle Physics Forces
@@ -78,12 +129,13 @@ public class CharacterController : ObjectController
         }
         if (Gliding && TotalSpeed.y < 0)
         {
-           
             GravityScale = _cData.GlideGravity;
+            _isFloating = true;
         }
         else
         {
             GravityScale = 1f;
+            _isFloating = false;
         }
         int layer = gameObject.layer;
         gameObject.layer = Physics2D.IgnoreRaycastLayer;
@@ -171,6 +223,21 @@ public class CharacterController : ObjectController
             Fly();
         }
         gameObject.layer = layer;
+        if (deltaMove.x > -0.01f && deltaMove.x < 0.01f && deltaMove.y > -0.01f && deltaMove.y < 0.01f)
+        {
+            _isMoving = false;
+        }
+        else
+        {
+            _isMoving = true;
+        }
+        if(deltaMove.y < 0 && _wallWalking == false)
+        {
+            _isFalling = true;
+        } else
+        {
+            _isFalling = false;
+        }
         return deltaMove;
     }
     public void Walk(float direction)
@@ -418,14 +485,18 @@ public class CharacterController : ObjectController
                 }
                 if (OnEdge)
                 {
-                    OnEdge = false;
-                    IgnoreEdges();
-                    Vector2 origin = _currentEdge.position;
-                    RaycastHit2D hitLeft = Physics2D.Raycast(origin, Vector2.left * 10, 1f, CollisionMask);
-                    ExternalForce.x += hitLeft ? _cData.WallJumpSpeed : -_cData.WallJumpSpeed;
-                    ResetJumpsAndDashes();
-                    _wallJumpBlock = _cData.WallJumpBlockTime;
+                    if (_currentEdge)
+                    {
+                        OnEdge = false;
+                        IgnoreEdges();
+                        Vector2 origin = _currentEdge.position;
+                        RaycastHit2D hitLeft = Physics2D.Raycast(origin, Vector2.left * 10, 1f, CollisionMask);
+                        ExternalForce.x += hitLeft ? _cData.WallJumpSpeed : -_cData.WallJumpSpeed;
+                        ResetJumpsAndDashes();
+                        _wallJumpBlock = _cData.WallJumpBlockTime;
+                    }
                 }
+               
                 Speed.y = Mathf.Sqrt(-2 * PConfig.Gravity * height);
                 ExternalForce.y = 0;
                 if (_cData.JumpCancelStagger)
@@ -435,10 +506,14 @@ public class CharacterController : ObjectController
                 // wall jump
                 if (_cData.CanWallJump && Collisions.hHit && !Collisions.below)
                 {
+                    _animator.SetTrigger("wallJump");
                     _wallWalking = false;
                     ExternalForce.x += Collisions.left ? _cData.WallJumpSpeed : -_cData.WallJumpSpeed;
                     ResetJumpsAndDashes();
                     _wallJumpBlock = _cData.WallJumpBlockTime;
+                } else
+                {
+                    _animator.SetTrigger("jump");
                 }
                 //slope sliding jump
                 if (Collisions.onSlope && Collisions.groundAngle > MaxSlopeAngle &&
@@ -747,14 +822,19 @@ public class CharacterController : ObjectController
             }
             if(direction == 1)
             {
-                Vector2 topPosition = _currentEdge.GetComponent<EdgeController>().TopPoint.position;
-                Vector2 targetPosition = new Vector2(topPosition.x, topPosition.y - MyCollider.bounds.extents.y / 2);
-                Tween t = transform.DOMove(targetPosition, 0.25f);
-                t.OnComplete(() =>
+                if (_currentEdge)
                 {
-                    OnEdge = false;
-                    _currentEdge = null;
-                });
+                    Vector2 topPosition = _currentEdge.GetComponent<EdgeController>().TopPoint.position;
+                    Vector2 targetPosition = new Vector2(topPosition.x, topPosition.y - MyCollider.bounds.extents.y / 2);
+                    Tween t = transform.DOMove(targetPosition, 0.25f);
+                    _climbEdge = true;
+                    t.OnComplete(() =>
+                    {
+                        OnEdge = false;
+                        _climbEdge = false;
+                        _currentEdge = null;
+                    });
+                }
                
                 //transform.position = _currentEdge.GetComponent<EdgeController>().TopPoint.position;
                 //JumpOut();
