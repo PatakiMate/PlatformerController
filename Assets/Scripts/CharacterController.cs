@@ -13,12 +13,13 @@ public class CharacterController : ObjectController
     public bool Flying { get; set; }
     public bool Gliding { get; set; }
     public bool Sliding { get; set; }
-    public SpriteRenderer Visual;
+    public Transform Armature;
 
     private CharacterData _cData;
     private Animator _animator;
     private PlayerInputController _pController;
     private Transform _currentEdge;
+    public Vector3 Test;
     private bool _slideNeed = false;
     public bool _wallWalking = false;
     private float _ignoreLaddersTime = 0;
@@ -127,13 +128,12 @@ public class CharacterController : ObjectController
         {
             FacingRight = TotalSpeed.x > 0;
         }
-        if (FacingRight)
+        if(FacingRight)
         {
-            Visual.transform.rotation = Quaternion.Euler(transform.eulerAngles.x, 0, transform.eulerAngles.z);
-        }
-        else
+            Armature.transform.rotation = Quaternion.Euler(-90,0,90);
+        } else
         {
-            Visual.transform.rotation = Quaternion.Euler(transform.eulerAngles.x, 180, transform.eulerAngles.z);
+            Armature.transform.rotation = Quaternion.Euler(-90,0,-90);
         }
         if (Gliding && TotalSpeed.y < 0)
         {
@@ -261,6 +261,7 @@ public class CharacterController : ObjectController
                 if (direction != 0)
                 {
                     FacingRight = direction > 0;
+                    //Armature.transform.rotation = Quaternion.Euler(Test);
                     //if(FacingRight)
                     //{
                     //    Visual.transform.rotation = Quaternion.Euler(transform.eulerAngles.x, 180, transform.eulerAngles.z);
