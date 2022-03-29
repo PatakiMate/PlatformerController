@@ -127,6 +127,14 @@ public class CharacterController : ObjectController
         {
             FacingRight = TotalSpeed.x > 0;
         }
+        if (FacingRight)
+        {
+            Visual.transform.rotation = Quaternion.Euler(transform.eulerAngles.x, 0, transform.eulerAngles.z);
+        }
+        else
+        {
+            Visual.transform.rotation = Quaternion.Euler(transform.eulerAngles.x, 180, transform.eulerAngles.z);
+        }
         if (Gliding && TotalSpeed.y < 0)
         {
             GravityScale = _cData.GlideGravity;
@@ -253,7 +261,14 @@ public class CharacterController : ObjectController
                 if (direction != 0)
                 {
                     FacingRight = direction > 0;
-                    if (Visual) Visual.flipX = !FacingRight;
+                    //if(FacingRight)
+                    //{
+                    //    Visual.transform.rotation = Quaternion.Euler(transform.eulerAngles.x, 180, transform.eulerAngles.z);
+                    //} else
+                    //{
+                    //    Visual.transform.rotation = Quaternion.Euler(transform.eulerAngles.x, 0, transform.eulerAngles.z);
+                    //}
+                    //if (Visual) Visual.flipX = !FacingRight;
                 }
                 return;
             }
