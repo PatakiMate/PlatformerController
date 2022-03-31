@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-[RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(PlayerCharacterController))]
 public class CharacterData : MonoBehaviour
 {
     [Header("Movement")]

@@ -20,6 +20,26 @@ MonoBehaviour:
   description: Follow Player
   drawGizmos: 0
   message: Follow Player
+--- !u!114 &-7602080876401165887
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fa4a3a2edda4c64facc0a1a3ab55c58, type: 3}
+  m_Name: EnemyCheckPlayerDistance
+  m_EditorClassIdentifier: 
+  state: 0
+  started: 0
+  guid: e3aef927d04c38543b17eab9ef7befa2
+  position: {x: 191.50002, y: 510}
+  blackboard: {fileID: 0}
+  description: 
+  drawGizmos: 0
+  IdealDistance: 5
 --- !u!114 &-7208622744993781278
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -39,6 +59,7 @@ MonoBehaviour:
   blackboard: {fileID: 0}
   description: 
   drawGizmos: 0
+  IdealDistance: 1
 --- !u!114 &-6990091540308343912
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -103,6 +124,7 @@ MonoBehaviour:
   drawGizmos: 0
   children:
   - {fileID: -1490723776003677070}
+  - {fileID: -706342609035594661}
   - {fileID: -2063972901859448898}
 --- !u!114 &-2909599285572889752
 MonoBehaviour:
@@ -141,7 +163,7 @@ MonoBehaviour:
   state: 0
   started: 0
   guid: 3546adc2746ed2643bfb97ffe2e7d0ac
-  position: {x: 250.50992, y: 370}
+  position: {x: 728.45526, y: 369.99997}
   blackboard: {fileID: 0}
   description: Player is far
   drawGizmos: 0
@@ -190,6 +212,27 @@ MonoBehaviour:
   description: Taking Demage
   drawGizmos: 0
   message: Taking Demage
+--- !u!114 &-706342609035594661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61431bba79d7d7843b82bf1de71703f5, type: 3}
+  m_Name: Sequencer
+  m_EditorClassIdentifier: 
+  state: 0
+  started: 0
+  guid: f0cb54dbc24429a45877f122c98c2702
+  position: {x: 322.00006, y: 371.00003}
+  blackboard: {fileID: 0}
+  description: 
+  drawGizmos: 0
+  children:
+  - {fileID: -7602080876401165887}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -219,6 +262,8 @@ MonoBehaviour:
   - {fileID: -930604371113641749}
   - {fileID: 1050064634710776278}
   - {fileID: -8838138165786528383}
+  - {fileID: -706342609035594661}
+  - {fileID: -7602080876401165887}
   blackboard: {fileID: 11400000, guid: 46c6198e652b79944a7603a2ad26b272, type: 2}
 --- !u!114 &1050064634710776278
 MonoBehaviour:
@@ -297,11 +342,11 @@ MonoBehaviour:
   state: 0
   started: 0
   guid: 8f4b92ee491377e418f208bd819291ca
-  position: {x: 176, y: 510}
+  position: {x: 653.45526, y: 509.9999}
   blackboard: {fileID: 0}
   description: Patrol
   drawGizmos: 0
-  message: 
+  message: Patrol
 --- !u!114 &8976729440518530705
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -317,8 +362,8 @@ MonoBehaviour:
   state: 0
   started: 0
   guid: dc61af45a823baf44af26622559d42a9
-  position: {x: 350.63147, y: 510}
+  position: {x: 828.45526, y: 509.9999}
   blackboard: {fileID: 0}
   description: Idle
   drawGizmos: 0
-  message: 
+  message: Idle

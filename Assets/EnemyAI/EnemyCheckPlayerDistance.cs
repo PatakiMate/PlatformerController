@@ -5,6 +5,7 @@ using TheKiwiCoder;
 
 public class EnemyCheckPlayerDistance : ActionNode
 {
+    public float IdealDistance;
     protected override void OnStart() {
     }
 
@@ -12,6 +13,12 @@ public class EnemyCheckPlayerDistance : ActionNode
     }
 
     protected override State OnUpdate() {
-        return State.Success;
+        if (Vector3.Distance(PlayerObject.Instance.transform.position, context.transform.position) < IdealDistance)
+        {
+            return State.Success;
+        } else
+        {
+            return State.Failure;
+        }
     }
 }

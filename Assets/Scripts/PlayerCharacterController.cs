@@ -5,7 +5,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(CharacterData))]
 [RequireComponent(typeof(PlayerInputController))]
-public class CharacterController : ObjectController
+public class PlayerCharacterController : ObjectController
 {
     public bool OnLadder { get; set; }
     public bool OnEdge { get; set; }
@@ -20,6 +20,8 @@ public class CharacterController : ObjectController
     private PlayerInputController _pController;
     private Transform _currentEdge;
     public Vector3 Test;
+    private bool _wasFacingRight;
+    private bool _canRotate = true;
     private bool _slideNeed = false;
     public bool _wallWalking = false;
     private float _ignoreLaddersTime = 0;
@@ -47,6 +49,7 @@ public class CharacterController : ObjectController
     private bool _onWall;
     private bool _onLadder;
     private bool _onGround;
+    private bool _wallJump;
     private bool _isMoving;
     private bool _isFloating;
     private bool _climbEdge;
@@ -76,7 +79,7 @@ public class CharacterController : ObjectController
     {
         _animator.SetBool("idle", _idle);
         _animator.SetBool("run", _run);
-        //_animator.SetBool("jump", _jump);
+        _animator.SetBool("wallJump", _wallJump);
         _animator.SetBool("crouch", _crouch);
         _animator.SetBool("isFlying", Flying);
         _animator.SetBool("climbLadder", _climbLadder);
@@ -130,12 +133,12 @@ public class CharacterController : ObjectController
         }
         if(FacingRight)
         {
-            Armature.DORotate(new Vector3(-90, 0, 90), _cData.DirectionChangeLerpTime);
-            //Armature.transform.rotation = Quaternion.Euler(-90,0,90);
+            float angle = Mathf.LerpAngle(Armature.transform.eulerAngles.y, 90, Time.fixedDeltaTime * _cData.DirectionChangeLerpTime);
+            Armature.transform.eulerAngles = new Vector3(-90, angle, 0);
         } else
         {
-            Armature.DORotate(new Vector3(-90, 0, -90), _cData.DirectionChangeLerpTime);
-            //Armature.transform.rotation = Quaternion.Euler(-90,0,-90);
+            float angle = Mathf.LerpAngle(Armature.transform.eulerAngles.y, 270, Time.fixedDeltaTime * _cData.DirectionChangeLerpTime);
+            Armature.transform.eulerAngles = new Vector3(-90, angle, 0);
         }
         if (Gliding && TotalSpeed.y < 0)
         {
@@ -183,6 +186,7 @@ public class CharacterController : ObjectController
         if(_wallWalking)
         {
             Speed.y = Mathf.RoundToInt(_pController.Axis.y) * _cData.WallWalkingSpeed;
+            _animator.SetFloat("wallClimbVerticalSpeed", _pController.Axis.y);
         }
         if (Collisions.hHit == false  || !_cData.CanWallSlide)
         {
@@ -512,6 +516,7 @@ public class CharacterController : ObjectController
                         ExternalForce.x += hitLeft ? _cData.WallJumpSpeed : -_cData.WallJumpSpeed;
                         ResetJumpsAndDashes();
                         _wallJumpBlock = _cData.WallJumpBlockTime;
+                        _wallJump = true;
                     }
                 }
                
@@ -529,6 +534,7 @@ public class CharacterController : ObjectController
                     ExternalForce.x += Collisions.left ? _cData.WallJumpSpeed : -_cData.WallJumpSpeed;
                     ResetJumpsAndDashes();
                     _wallJumpBlock = _cData.WallJumpBlockTime;
+                    _wallJump = true;
                 } else
                 {
                     _animator.SetTrigger("jump");
@@ -816,6 +822,7 @@ public class CharacterController : ObjectController
                 //Vector3 height = new Vector3(0, MyCollider.bounds.extents.y * 2 - hit.bounds.extents.y, 0);
                 //transform.DOMove(hit.transform.position - height, 0.15f);
                 ExternalForce = Vector2.zero;
+                FacingRight = _currentEdge.GetComponent<EdgeController>().TopPoint.position.x < _currentEdge.position.x ? false : true;
             }
         } else
         {
@@ -823,6 +830,7 @@ public class CharacterController : ObjectController
         }
         if (OnEdge)
         {
+           
             if (hit)
             {
                 Vector3 height = new Vector3(0, MyCollider.bounds.extents.y * 2 - hit.bounds.extents.y, 0);
@@ -888,6 +896,9 @@ public class CharacterController : ObjectController
         if(_wallJumpBlock > 0)
         {
             _wallJumpBlock -= Time.fixedDeltaTime;
+        } else
+        {
+            _wallJump = false;
         }
         //if (_slideTiming > _cData.SlideTime)
         //{

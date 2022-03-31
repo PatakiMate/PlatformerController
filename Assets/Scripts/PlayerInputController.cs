@@ -2,18 +2,18 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(PlayerCharacterController))]
 public class PlayerInputController : MonoBehaviour
 {
     public Vector2 Axis;
     public Vector2 AimAxis;
 
     private InputMaster _controls;
-    private CharacterController _character;
+    private PlayerCharacterController _character;
 
     void Awake()
     {
-        _character = GetComponent<CharacterController>();
+        _character = GetComponent<PlayerCharacterController>();
 
         #region Setup Control Actions
         _controls = new InputMaster();

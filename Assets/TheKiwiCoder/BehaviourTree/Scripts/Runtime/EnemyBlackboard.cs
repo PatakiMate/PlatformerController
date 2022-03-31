@@ -8,5 +8,11 @@ namespace TheKiwiCoder
     public class EnemyBlackboard : Blackboard
     {
         public string enemyName;
+        public Transform EnemyTransform;
+
+        public void Setup(Transform transform)
+        {
+            this.EnemyTransform = transform;
+        }
     }
 }
