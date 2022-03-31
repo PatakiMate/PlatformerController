@@ -11,6 +11,7 @@ public class CharacterData : MonoBehaviour
     public float DecelerationTime;
     public bool CanUseSlopes;
     public float GlideGravity;
+    public float DirectionChangeLerpTime;
     [Header("Jumping")]
     public int MaxExtraJumps;
     public float MaxJumpHeight;

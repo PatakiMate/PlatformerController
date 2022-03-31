@@ -130,10 +130,12 @@ public class CharacterController : ObjectController
         }
         if(FacingRight)
         {
-            Armature.transform.rotation = Quaternion.Euler(-90,0,90);
+            Armature.DORotate(new Vector3(-90, 0, 90), _cData.DirectionChangeLerpTime);
+            //Armature.transform.rotation = Quaternion.Euler(-90,0,90);
         } else
         {
-            Armature.transform.rotation = Quaternion.Euler(-90,0,-90);
+            Armature.DORotate(new Vector3(-90, 0, -90), _cData.DirectionChangeLerpTime);
+            //Armature.transform.rotation = Quaternion.Euler(-90,0,-90);
         }
         if (Gliding && TotalSpeed.y < 0)
         {
