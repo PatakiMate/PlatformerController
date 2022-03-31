@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: BasicEnemyBlackboard
   m_EditorClassIdentifier: 
   enemyName: 
+  EnemyTransform: {fileID: 0}
