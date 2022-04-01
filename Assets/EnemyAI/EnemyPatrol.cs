@@ -7,11 +7,35 @@ public class EnemyPatrol : ActionNode
 {
     public Vector2 TargetPosition;
     public float ReachedDistance;
+    public float RecognizeDistance;
+    public float RecognizeDistanceFace;
+    public float RecognizeDistanceBack;
     protected override void OnStart()
     {
         TargetPosition = context.enemyController.GetRandomTarget();
         context.enemyController.SetTarget(TargetPosition);
         context.enemyController.SetSpeed(context.enemyController.EData.PatrolSpeed);
+    }
+
+    private float GetRecognizeDistance()
+    {
+        if (context.enemyController.FacingRight && context.enemyController.Player.transform.position.x < context.transform.position.x)
+        {
+            return RecognizeDistanceBack;
+        }
+        if (context.enemyController.FacingRight && context.enemyController.Player.transform.position.x > context.transform.position.x)
+        {
+            return RecognizeDistanceFace;
+        }
+        if (context.enemyController.FacingRight == false && context.enemyController.Player.transform.position.x < context.transform.position.x)
+        {
+            return RecognizeDistanceFace;
+        }
+        if (context.enemyController.FacingRight == false && context.enemyController.Player.transform.position.x > context.transform.position.x)
+        {
+            return RecognizeDistanceBack;
+        }
+        return 0;
     }
 
     protected override void OnStop()
@@ -25,10 +49,20 @@ public class EnemyPatrol : ActionNode
 
     protected override State OnUpdate()
     {
-        if(TargetDistance(TargetPosition) < ReachedDistance)
+        RecognizeDistance = GetRecognizeDistance();
+        if (TargetDistance(context.enemyController.Player.transform.position) < GetRecognizeDistance())
         {
             return State.Success;
-        } else
+        }
+        if (TargetDistance(TargetPosition) < ReachedDistance)
+        {
+            return State.Failure;
+        }
+        else
+        {
+            return State.Running;
+        }
+        if (TargetDistance(context.enemyController.Player.transform.position) > GetRecognizeDistance())
         {
             return State.Running;
         }

@@ -35,12 +35,10 @@ MonoBehaviour:
   state: 0
   started: 0
   guid: 28c72902a72c78d4a9dafd3f481bbee7
-  position: {x: 74.99994, y: 369.99994}
+  position: {x: 284.56158, y: 507.99994}
   blackboard: {fileID: 0}
   description: 
   drawGizmos: 0
-  RecognizeDistanceFace: 4
-  RecognizeDistanceBack: 1
   MaxDistance: 10
 --- !u!114 &-5207307355272441329
 MonoBehaviour:
@@ -84,28 +82,7 @@ MonoBehaviour:
   children:
   - {fileID: 1793709731099296160}
   - {fileID: -1490723776003677070}
-  - {fileID: -5464935738309913899}
   - {fileID: -3896522473519126291}
---- !u!114 &-4329919101192101754
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a5134d9de14153468b48928d3e7359a, type: 3}
-  m_Name: Wait
-  m_EditorClassIdentifier: 
-  state: 0
-  started: 0
-  guid: 9d3dfd96fde67f74997a43327e0e08f0
-  position: {x: 376.14124, y: 508.00006}
-  blackboard: {fileID: 0}
-  description: 
-  drawGizmos: 0
-  duration: 1
 --- !u!114 &-3896522473519126291
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -121,13 +98,13 @@ MonoBehaviour:
   state: 0
   started: 0
   guid: f2d3db73a525e30448d778f5dd246cc4
-  position: {x: 301.1413, y: 370.00006}
+  position: {x: 192.56157, y: 369.99994}
   blackboard: {fileID: 0}
   description: 
   drawGizmos: 0
   children:
   - {fileID: 8962529097396514345}
-  - {fileID: -4329919101192101754}
+  - {fileID: -5464935738309913899}
 --- !u!114 &-2909599285572889752
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -149,7 +126,7 @@ MonoBehaviour:
   drawGizmos: 0
   child: {fileID: -4680376946575970962}
   restartOnSuccess: 1
-  restartOnFailure: 0
+  restartOnFailure: 1
 --- !u!114 &-1846938385277809463
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -216,7 +193,6 @@ MonoBehaviour:
   - {fileID: -7208622744993781278}
   - {fileID: 5335455028553005785}
   - {fileID: 1793709731099296160}
-  - {fileID: -4329919101192101754}
   - {fileID: 8962529097396514345}
   - {fileID: -5464935738309913899}
   - {fileID: -3896522473519126291}
@@ -276,9 +252,12 @@ MonoBehaviour:
   state: 0
   started: 0
   guid: 27d51737f11348547ad5df650db5b103
-  position: {x: 213.14133, y: 508.00006}
+  position: {x: 104.561615, y: 507.99994}
   blackboard: {fileID: 0}
   description: 
   drawGizmos: 0
   TargetPosition: {x: 0, y: 0}
   ReachedDistance: 1
+  RecognizeDistance: 0
+  RecognizeDistanceFace: 4
+  RecognizeDistanceBack: 1

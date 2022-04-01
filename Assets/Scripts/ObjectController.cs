@@ -122,7 +122,7 @@ public class ObjectController : MonoBehaviour
 
     public virtual Vector2 Move(Vector2 deltaMove)
     {
-      
+
         int layer = gameObject.layer;
         gameObject.layer = Physics2D.IgnoreRaycastLayer;
         PreMove(ref deltaMove);
@@ -219,9 +219,70 @@ public class ObjectController : MonoBehaviour
         }
     }
 
+    //protected void HorizontalCollisions(ref Vector2 deltaMove)
+    //{
+    //    float directionX = Mathf.Sign(deltaMove.x);
+    //    float rayLength = Mathf.Abs(deltaMove.x) + SkinWidth;
+    //    for (int i = 0; i < HorizontalRayCount; i++)
+    //    {
+    //        Vector2 rayOrigin = directionX == -1 ? RayOrigins.bottomLeft : RayOrigins.bottomRight;
+    //        rayOrigin += Vector2.up * (HorizontalRaySpacing * i);
+    //        RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * directionX,
+    //            rayLength, CollisionMask);
+    //        Debug.DrawRay(rayOrigin, Vector2.right * directionX * rayLength, Color.red);
+    //        if (hit)
+    //        {
+    //            float angle = Vector2.Angle(hit.normal, Vector2.up);
+    //            if (i == 0 && !Collisions.onSlope && angle < MinWallAngle)
+    //            {
+    //                Collisions.onGround = true;
+    //                Collisions.groundAngle = angle;
+    //                Collisions.groundDirection = Mathf.Sign(hit.normal.x);
+    //                deltaMove.x -= (hit.distance - SkinWidth) * directionX;
+    //                ClimbSlope(ref deltaMove);
+    //                deltaMove.x += (hit.distance - SkinWidth) * directionX;
+    //                rayLength = Mathf.Min(Mathf.Abs(deltaMove.x) + SkinWidth, hit.distance);
+    //            }
+    //            if (!(i == 0 && Collisions.onSlope))
+    //            {
+    //                if (angle > MaxSlopeAngle)
+    //                {
+    //                    if (angle < MinWallAngle)
+    //                    {
+    //                        continue;
+    //                    }
+    //                    deltaMove.x = Mathf.Min(Mathf.Abs(deltaMove.x), (hit.distance - SkinWidth)) * directionX;
+    //                    rayLength = Mathf.Min(Mathf.Abs(deltaMove.x) + SkinWidth, hit.distance);
+    //                    if (Collisions.onSlope && Collisions.groundAngle < MinWallAngle)
+    //                    {
+    //                        if (deltaMove.y < 0)
+    //                        {
+    //                            deltaMove.y = 0;
+    //                        }
+    //                        else
+    //                        {
+    //                            deltaMove.y = Mathf.Tan(Collisions.groundAngle * Mathf.Deg2Rad) *
+    //                                Mathf.Abs(deltaMove.x) * Mathf.Sign(deltaMove.y);
+    //                        }
+    //                    }
+    //                    Collisions.left = directionX < 0;
+    //                    Collisions.right = directionX > 0;
+    //                    Collisions.hHit = hit;
+    //                    Speed.x = 0;
+    //                    ExternalForce.x = 0;
+    //                }
+    //            }
+    //        }
+    //    }
+    //}
+
     protected void HorizontalCollisions(ref Vector2 deltaMove)
     {
         float directionX = Mathf.Sign(deltaMove.x);
+        if (this.gameObject.tag != "Player")
+        {
+            directionX = FacingRight ? 1 : -1;
+        }
         float rayLength = Mathf.Abs(deltaMove.x) + SkinWidth;
         for (int i = 0; i < HorizontalRayCount; i++)
         {
@@ -229,51 +290,47 @@ public class ObjectController : MonoBehaviour
             rayOrigin += Vector2.up * (HorizontalRaySpacing * i);
             RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * directionX,
                 rayLength, CollisionMask);
-            Debug.DrawRay(rayOrigin, Vector2.right * directionX * rayLength, Color.red);
+            Debug.DrawRay(rayOrigin, Vector2.right * directionX * rayLength * 2, Color.red);
             if (hit)
             {
-                float angle = Vector2.Angle(hit.normal, Vector2.up);
-                if (i == 0 && !Collisions.onSlope && angle < MinWallAngle)
+                if (this.gameObject.tag != "Player")
                 {
-                    Collisions.onGround = true;
-                    Collisions.groundAngle = angle;
-                    Collisions.groundDirection = Mathf.Sign(hit.normal.x);
-                    deltaMove.x -= (hit.distance - SkinWidth) * directionX;
-                    ClimbSlope(ref deltaMove);
-                    deltaMove.x += (hit.distance - SkinWidth) * directionX;
-                    rayLength = Mathf.Min(Mathf.Abs(deltaMove.x) + SkinWidth, hit.distance);
+                   
                 }
-                if (!(i == 0 && Collisions.onSlope))
+                //float angle = Vector2.Angle(hit.normal, Vector2.up);
+                //if (i == 0 && !Collisions.onSlope && angle < MinWallAngle)
+                //{
+                //    Collisions.onGround = true;
+                //    Collisions.groundAngle = angle;
+                //    Collisions.groundDirection = Mathf.Sign(hit.normal.x);
+                //    deltaMove.x -= (hit.distance - SkinWidth) * directionX;
+                //    ClimbSlope(ref deltaMove);
+                //    deltaMove.x += (hit.distance - SkinWidth) * directionX;
+                //    rayLength = Mathf.Min(Mathf.Abs(deltaMove.x) + SkinWidth, hit.distance);
+                //}
+
+                deltaMove.x = Mathf.Min(Mathf.Abs(deltaMove.x), (hit.distance - SkinWidth)) * directionX;
+                rayLength = Mathf.Min(Mathf.Abs(deltaMove.x) + SkinWidth, hit.distance);
+                if (Collisions.onSlope && Collisions.groundAngle < MinWallAngle)
                 {
-                    if (angle > MaxSlopeAngle)
+                    if (deltaMove.y < 0)
                     {
-                        if (angle < MinWallAngle)
-                        {
-                            continue;
-                        }
-                        deltaMove.x = Mathf.Min(Mathf.Abs(deltaMove.x), (hit.distance - SkinWidth)) * directionX;
-                        rayLength = Mathf.Min(Mathf.Abs(deltaMove.x) + SkinWidth, hit.distance);
-                        if (Collisions.onSlope && Collisions.groundAngle < MinWallAngle)
-                        {
-                            if (deltaMove.y < 0)
-                            {
-                                deltaMove.y = 0;
-                            }
-                            else
-                            {
-                                deltaMove.y = Mathf.Tan(Collisions.groundAngle * Mathf.Deg2Rad) *
-                                    Mathf.Abs(deltaMove.x) * Mathf.Sign(deltaMove.y);
-                            }
-                        }
-                        Collisions.left = directionX < 0;
-                        Collisions.right = directionX > 0;
-                        Collisions.hHit = hit;
-                        Speed.x = 0;
-                        ExternalForce.x = 0;
+                        deltaMove.y = 0;
+                    }
+                    else
+                    {
+                        deltaMove.y = Mathf.Tan(Collisions.groundAngle * Mathf.Deg2Rad) *
+                            Mathf.Abs(deltaMove.x) * Mathf.Sign(deltaMove.y);
                     }
                 }
+                Collisions.left = directionX < 0;
+                Collisions.right = directionX > 0;
+                Collisions.hHit = hit;
+                Speed.x = 0;
+                ExternalForce.x = 0;
             }
         }
+
     }
 
     protected virtual void VerticalCollisions(ref Vector2 deltaMove)
