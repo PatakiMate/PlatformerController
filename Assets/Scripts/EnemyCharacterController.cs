@@ -27,6 +27,7 @@ public class EnemyCharacterController : ObjectController
     public override void FixedUpdate()
     {
         base.FixedUpdate();
+        SetTarget(_target);
         if (CanCrawl == false)
         {
             if (Mathf.Abs(transform.position.x - _target.x) > 0.5f)
@@ -36,18 +37,21 @@ public class EnemyCharacterController : ObjectController
         }
         else
         {
+            bool shouldClimb = false;
+            if (transform.position.x < _target.x && transform.position.x < Collisions.hHit.point.x)
+            {
+                shouldClimb = true;
+            }
+            if (transform.position.x > _target.x && transform.position.x > Collisions.hHit.point.x)
+            {
+                shouldClimb = true;
+            }
             //BOTH
             if (Collisions.hHit && Collisions.vHit)
             {
-                bool shouldClimb = false;
-                if(transform.position.x < _target.x && transform.position.x < Collisions.hHit.point.x)
-                {
-                    shouldClimb = true;
-                }
-                if (transform.position.x > _target.x && transform.position.x > Collisions.hHit.point.x)
-                {
-                    shouldClimb = true;
-                }
+                //Debug.LogError("SHOULD CLIMB: " + shouldClimb);
+                _climbing = false;
+                //Debug.LogError("BOTH");
                 if (Mathf.Abs(transform.position.x - _target.x) > Mathf.Abs(transform.position.y - _target.y) && shouldClimb == false)
                 {
                     _crawling = false;
@@ -67,13 +71,25 @@ public class EnemyCharacterController : ObjectController
             //HORIZONTAL
             if (!Collisions.hHit && Collisions.vHit)
             {
+                //Debug.LogError("HORIZONTAL");
                 _crawling = false;
                 Walk(transform.position.x < _target.x ? 1 : -1, 0);
             }
             //VERTICAL
             if (Collisions.hHit && !Collisions.vHit)
             {
+                //Debug.LogError("VERTICAL");
                 _crawling = true;
+                if (shouldClimb)
+                {
+                    _targetOverride = new Vector2(0, transform.position.y + 1000);
+                    _climbing = true;
+                }
+                if (Mathf.Abs(transform.position.x - _target.x) > Mathf.Abs(transform.position.y - _target.y))
+                {
+                    _targetOverride = new Vector2(0, transform.position.y - 1000);
+                    _climbing = true;
+                }
                 Walk(0, transform.position.y < _target.y ? 1 : -1);
             }
             //NONE
@@ -286,7 +302,7 @@ public class EnemyCharacterController : ObjectController
 
     public Vector2 GetRandomTarget()
     {
-        Vector2 output = new Vector2(Random.Range(StartPoint.position.x, EndPoint.position.x), transform.position.y);
+        Vector2 output = new Vector2(Random.Range(StartPoint.position.x, EndPoint.position.x), StartPoint.position.y);
         return output;
     }
 }
