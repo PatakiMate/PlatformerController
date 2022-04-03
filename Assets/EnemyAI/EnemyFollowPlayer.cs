@@ -51,6 +51,7 @@ public class EnemyFollowPlayer : ActionNode
         {
             if (context.enemyController.CanCrawl)
             {
+                //Debug.LogError("SET TARGET PLAYER");
                 context.enemyController.SetTarget(new Vector2(context.enemyController.Player.transform.position.x, context.enemyController.Player.transform.position.y));
             } else
             {

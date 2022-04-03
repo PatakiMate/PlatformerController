@@ -98,23 +98,29 @@ public class EnemyCharacterController : ObjectController
                     _targetOverride = new Vector2(0, transform.position.y + 1000);
                     _climbing = true;
                 }
-                if (Mathf.Abs(transform.position.x - _target.x) > Mathf.Abs(transform.position.y - _target.y))
-                {
-                    _targetOverride = new Vector2(0, transform.position.y - 1000);
-                    _climbing = true;
-                }
+                //if (Mathf.Abs(transform.position.x - _target.x) > Mathf.Abs(transform.position.y - _target.y))
+                //{
+                //    _targetOverride = new Vector2(0, transform.position.y - 1000);
+                //    Debug.LogError("SHOULD CLIMB");
+                //    _climbing = true;
+                //}
                 Walk(0, transform.position.y < _target.y ? 1 : -1);
             }
             //NONE
             if (!Collisions.hHit && !Collisions.vHit)
             {
-                if(_crawling)
+                if (_crawling)
                 {
                     Walk(transform.position.x < _target.x ? 1 : -1, 0);
                 }
                 _crawling = false;
                 _climbing = false;
             }
+        }
+        if(_climbing == false)
+        {
+            _targetOverride = Vector2.zero;
+            SetTarget(_target);
         }
         if (TotalSpeed.x != 0)
         {
@@ -151,7 +157,6 @@ public class EnemyCharacterController : ObjectController
     }
     public override Vector2 Move(Vector2 deltaMove)
     {
-
         int layer = gameObject.layer;
         gameObject.layer = Physics2D.IgnoreRaycastLayer;
         PreMove(ref deltaMove);
