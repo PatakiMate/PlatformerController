@@ -62,9 +62,9 @@ public class EnemyPatrol : ActionNode
         {
             return State.Running;
         }
-        if (TargetDistance(context.enemyController.Player.transform.position) > GetRecognizeDistance())
-        {
-            return State.Running;
-        }
+        //if (TargetDistance(context.enemyController.Player.transform.position) > GetRecognizeDistance())
+        //{
+        //    return State.Running;
+        //}
     }
 }

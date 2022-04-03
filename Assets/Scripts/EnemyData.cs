@@ -12,4 +12,6 @@ public class EnemyData : MonoBehaviour
     public float DecelerationTime;
     public bool CanUseSlopes;
     public float DirectionChangeLerpTime;
+    [Header("Attack")]
+    public float MeleeCooldownTime;
 }

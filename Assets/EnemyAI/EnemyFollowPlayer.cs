@@ -7,6 +7,7 @@ public class EnemyFollowPlayer : ActionNode
 {
     private bool _following;
     public float MaxDistance;
+    public float ReachedDistance;
     protected override void OnStart()
     {
         _following = true;
@@ -41,6 +42,11 @@ public class EnemyFollowPlayer : ActionNode
         //        return State.Failure;
         //    }
         //}
+        if(TargetDistance(context.enemyController.Player.transform.position) < ReachedDistance)
+        {
+            //context.enemyController.Animator.SetTrigger("hit");
+            return State.Success;
+        }
         if (TargetDistance(context.enemyController.Player.transform.position) < MaxDistance)
         {
             if (context.enemyController.CanCrawl)

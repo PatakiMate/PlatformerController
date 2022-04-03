@@ -1,5 +1,25 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-7580228698137891829
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7887b5e62426f884aa4ed690ca1d74dd, type: 3}
+  m_Name: EnemyMeleeAttack
+  m_EditorClassIdentifier: 
+  state: 0
+  started: 0
+  guid: b1cd3f68e491d35448dc6e92a263e56f
+  position: {x: 366, y: 755}
+  blackboard: {fileID: 0}
+  description: 
+  drawGizmos: 0
+  timer: 0
 --- !u!114 &-7208622744993781278
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15,11 +35,33 @@ MonoBehaviour:
   state: 0
   started: 0
   guid: 294724bc71ce05940bdd30273b489ca9
-  position: {x: -290, y: 510.00003}
+  position: {x: -290.00003, y: 508}
   blackboard: {fileID: 0}
   description: 
   drawGizmos: 0
-  IdealDistance: 0.1
+  IdealDistance: 0.5
+--- !u!114 &-6843489746904426788
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afb5496e8cd973748a10b3e3ef436ebd, type: 3}
+  m_Name: Repeat
+  m_EditorClassIdentifier: 
+  state: 0
+  started: 0
+  guid: 74215d098b9c84741ab7335e75f0c3f2
+  position: {x: 291.00006, y: 508}
+  blackboard: {fileID: 0}
+  description: 
+  drawGizmos: 0
+  child: {fileID: 7128262663957551825}
+  restartOnSuccess: 1
+  restartOnFailure: 0
 --- !u!114 &-5464935738309913899
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35,11 +77,12 @@ MonoBehaviour:
   state: 0
   started: 0
   guid: 28c72902a72c78d4a9dafd3f481bbee7
-  position: {x: 284.56158, y: 507.99994}
+  position: {x: 216.00009, y: 754.71}
   blackboard: {fileID: 0}
   description: 
   drawGizmos: 0
   MaxDistance: 10
+  ReachedDistance: 2
 --- !u!114 &-5207307355272441329
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -55,7 +98,7 @@ MonoBehaviour:
   state: 0
   started: 0
   guid: e2bde762c9b51534ab83b8dcb44fc26d
-  position: {x: 0, y: 0}
+  position: {x: -0.0000731163, y: -303.6275}
   blackboard: {fileID: 0}
   description: 
   drawGizmos: 0
@@ -104,7 +147,28 @@ MonoBehaviour:
   drawGizmos: 0
   children:
   - {fileID: 8962529097396514345}
-  - {fileID: -5464935738309913899}
+  - {fileID: -6843489746904426788}
+--- !u!114 &-3129661653537194067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2932073b8a6c3b34391576c45d359457, type: 3}
+  m_Name: Parallel
+  m_EditorClassIdentifier: 
+  state: 0
+  started: 0
+  guid: 7f067d4484dbc7346838adfbd132532e
+  position: {x: -0.000076293945, y: 43.64212}
+  blackboard: {fileID: 0}
+  description: 
+  drawGizmos: 0
+  children:
+  - {fileID: -4680376946575970962}
 --- !u!114 &-2909599285572889752
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -120,11 +184,11 @@ MonoBehaviour:
   state: 0
   started: 0
   guid: 930aee6d04c9639479aa818c216d48d0
-  position: {x: -0.000015258789, y: 114.09143}
+  position: {x: -0.0000731163, y: -168.88275}
   blackboard: {fileID: 0}
   description: 
   drawGizmos: 0
-  child: {fileID: -4680376946575970962}
+  child: {fileID: -3129661653537194067}
   restartOnSuccess: 1
   restartOnFailure: 1
 --- !u!114 &-1846938385277809463
@@ -196,6 +260,10 @@ MonoBehaviour:
   - {fileID: 8962529097396514345}
   - {fileID: -5464935738309913899}
   - {fileID: -3896522473519126291}
+  - {fileID: -6843489746904426788}
+  - {fileID: -7580228698137891829}
+  - {fileID: 7128262663957551825}
+  - {fileID: -3129661653537194067}
   blackboard: {fileID: 11400000, guid: 46c6198e652b79944a7603a2ad26b272, type: 2}
 --- !u!114 &1793709731099296160
 MonoBehaviour:
@@ -237,6 +305,28 @@ MonoBehaviour:
   description: Attack
   drawGizmos: 0
   message: Attack
+--- !u!114 &7128262663957551825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61431bba79d7d7843b82bf1de71703f5, type: 3}
+  m_Name: Sequencer
+  m_EditorClassIdentifier: 
+  state: 0
+  started: 0
+  guid: a26b8e26f128fe74e86e4676e8565003
+  position: {x: 291.00006, y: 620.71}
+  blackboard: {fileID: 0}
+  description: 
+  drawGizmos: 0
+  children:
+  - {fileID: -5464935738309913899}
+  - {fileID: -7580228698137891829}
 --- !u!114 &8962529097396514345
 MonoBehaviour:
   m_ObjectHideFlags: 0

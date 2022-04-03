@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,11 +18,23 @@ public class EnemyCharacterController : ObjectController
     public EnemyData EData;
     [HideInInspector]
     public Transform Player;
+    [HideInInspector]
+    public Animator Animator;
+    public Transform MeleeHitPoint;
+    public LayerMask HitLayer;
+    public Action AnimHit;
+    public float MeleeCooldownTimer;
+
     public override void Start()
     {
         EData = GetComponent<EnemyData>();
         Player = PlayerObject.Instance.transform;
+        Animator = GetComponent<Animator>();
         base.Start();
+    }
+    private void Update()
+    {
+        RunTimer();
     }
 
     public override void FixedUpdate()
@@ -299,10 +312,22 @@ public class EnemyCharacterController : ObjectController
             _target.y = _targetOverride.y;
         }
     }
+    public void CallHit()
+    {
+        AnimHit?.Invoke();
+    }
 
     public Vector2 GetRandomTarget()
     {
-        Vector2 output = new Vector2(Random.Range(StartPoint.position.x, EndPoint.position.x), StartPoint.position.y);
+        Vector2 output = new Vector2(UnityEngine.Random.Range(StartPoint.position.x, EndPoint.position.x), StartPoint.position.y);
         return output;
+    }
+
+    public void RunTimer()
+    {
+        if(MeleeCooldownTimer > 0)
+        {
+            MeleeCooldownTimer -= Time.deltaTime;
+        }
     }
 }
