@@ -3,25 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyCharacterController : ObjectController
+public class EnemyLocustController : EnemyCharacterController
 {
-    public Transform StartPoint;
-    public Transform EndPoint;
     private float _currentSpeed;
-    public Vector2 _target;
-    public bool CanCrawl;
     private Vector2 _targetOverride;
-    public Transform Armature;
-    [HideInInspector]
-    public EnemyData EData;
-    [HideInInspector]
-    public Transform Player;
-    [HideInInspector]
-    public Animator Animator;
-    public Transform MeleeHitPoint;
-    public LayerMask HitLayer;
-    public Action AnimHit;
-    public float MeleeCooldownTimer;
+    private bool _crawling;
+    public bool _climbing;
 
     public override void Start()
     {
@@ -38,26 +25,86 @@ public class EnemyCharacterController : ObjectController
     public override void FixedUpdate()
     {
         base.FixedUpdate();
-        SetTarget(_target);
-        if (TotalSpeed.x != 0)
+        if (CanCrawl == false)
         {
-            FacingRight = TotalSpeed.x > 0;
-        }
-        if (FacingRight)
-        {
-            float angle = Mathf.LerpAngle(Armature.transform.eulerAngles.y, 0, Time.fixedDeltaTime * EData.DirectionChangeLerpTime);
-            Armature.transform.eulerAngles = new Vector3(0, angle, 0);
+            if (Mathf.Abs(transform.position.x - _target.x) > 0.5f)
+            {
+                Walk(transform.position.x < _target.x ? 1 : -1);
+            }
         }
         else
         {
-            float angle = Mathf.LerpAngle(Armature.transform.eulerAngles.y, 180, Time.fixedDeltaTime * EData.DirectionChangeLerpTime);
-            Armature.transform.eulerAngles = new Vector3(0, angle, 0);
+            bool shouldClimb = false;
+            if (transform.position.x < _target.x && transform.position.x < Collisions.hHit.point.x)
+            {
+                shouldClimb = true;
+            }
+            if (transform.position.x > _target.x && transform.position.x > Collisions.hHit.point.x)
+            {
+                shouldClimb = true;
+            }
+            //BOTH
+            if (Collisions.hHit && Collisions.vHit)
+            {
+                _climbing = false;
+                if (Mathf.Abs(transform.position.x - _target.x) > Mathf.Abs(transform.position.y - _target.y) && shouldClimb == false)
+                {
+                    _crawling = false;
+                    Walk(transform.position.x < _target.x ? 1 : -1, 0);
+                }
+                else
+                {
+                    _crawling = true;
+                    if (shouldClimb)
+                    {
+                        _targetOverride = new Vector2(0, transform.position.y + 1000);
+                        _climbing = true;
+                    }
+                    Walk(0, transform.position.y < _target.y ? 1 : -1);
+                }
+            }
+            //HORIZONTAL
+            if (!Collisions.hHit && Collisions.vHit)
+            {
+                _crawling = false;
+                Walk(transform.position.x < _target.x ? 1 : -1, 0);
+            }
+            //VERTICAL
+            if (Collisions.hHit && !Collisions.vHit)
+            {
+                _crawling = true;
+                if (shouldClimb)
+                {
+                    _targetOverride = new Vector2(0, transform.position.y + 1000);
+                    _climbing = true;
+                }
+                Walk(0, transform.position.y < _target.y ? 1 : -1);
+            }
+            //NONE
+            if (!Collisions.hHit && !Collisions.vHit)
+            {
+                if (_crawling)
+                {
+                    Walk(transform.position.x < _target.x ? 1 : -1, 0);
+                }
+                _crawling = false;
+                _climbing = false;
+            }
+        }
+        if (_climbing == false)
+        {
+            _targetOverride = Vector2.zero;
+            SetTarget(_target);
         }
     }
 
 
     protected override void UpdateGravity()
     {
+        if (_crawling)
+        {
+            return;
+        }
         float g = PConfig.Gravity * GravityScale * Time.fixedDeltaTime;
         if (Speed.y > 0)
         {
@@ -126,7 +173,7 @@ public class EnemyCharacterController : ObjectController
         return deltaMove;
     }
 
-    public virtual void Walk(float directionX, float directionY = 0)
+    public override void Walk(float directionX, float directionY = 0)
     {
         if (Collisions.onSlope && Collisions.groundAngle > MaxSlopeAngle && Collisions.groundAngle < MinWallAngle)
         {
@@ -179,31 +226,11 @@ public class EnemyCharacterController : ObjectController
                 }
             }
         }
-    }
-    public void SetSpeed(float speed)
-    {
-        _currentSpeed = speed;
-    }
-    public void SetTarget(Vector2 target)
-    {
-        _target = target;
-    }
-    public void CallHit()
-    {
-        AnimHit?.Invoke();
-    }
 
-    public Vector2 GetRandomTarget()
-    {
-        Vector2 output = new Vector2(UnityEngine.Random.Range(StartPoint.position.x, EndPoint.position.x), StartPoint.position.y);
-        return output;
-    }
-
-    public void RunTimer()
-    {
-        if(MeleeCooldownTimer > 0)
+        if (CanCrawl && Mathf.Abs(transform.position.y - _target.y) > 0.5f)
         {
-            MeleeCooldownTimer -= Time.deltaTime;
+            //YYY
+            Speed.y = _currentSpeed * directionY;
         }
     }
 }

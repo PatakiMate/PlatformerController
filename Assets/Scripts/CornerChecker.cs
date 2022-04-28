@@ -20,6 +20,14 @@ public class CornerChecker : MonoBehaviour
     public float ExtraLenght;
     private Coroutine generator;
     public List<RayClass> rayClasses = new List<RayClass>();
+    public List<RayClass> realRayClasses = new List<RayClass>();
+
+    private List<Vector2> hitpoints = new List<Vector2>();
+
+    public Transform TestObject1;
+    public Transform TestObject2;
+    public bool testRay;
+    public float divider;
 
     [System.Serializable]
     public class RayClass
@@ -34,13 +42,36 @@ public class CornerChecker : MonoBehaviour
     {
         if(update)
         {
+            realRayClasses.Clear();
+            foreach(RayClass rayClass in rayClasses)
+            {
+                RayClass ray = new RayClass();
+                ray.origin = new Vector2(rayClass.origin.x / divider, rayClass.origin.y / divider);
+                ray.direction1 = new Vector2(rayClass.direction1.x / divider, rayClass.direction1.y / divider);
+                ray.direction2 = new Vector2(rayClass.direction2.x / divider, rayClass.direction2.y / divider);
+                ray.color1 = rayClass.color1;
+                ray.color2 = rayClass.color2;
+                realRayClasses.Add(ray);
+            }
             generator = StartCoroutine(Generate());
             update = false;
         }
         if(test)
         {
-            HasCorner(Vector2.zero, true);
+            Vector2 cornerpos;
+            HasCorner(Vector2.zero, true, out cornerpos);
             test = false;
+        }
+        if(testRay)
+        {
+            hitpoints.Clear();
+            RaycastHit2D ray = Physics2D.Raycast(TestObject1.position, TestObject2.position - TestObject1.position, Vector2.Distance(TestObject1.position, TestObject2.position), CollisionMask);
+            Debug.DrawRay(TestObject1.position, (TestObject2.position - TestObject1.position), Color.blue, 2);
+            if(ray)
+            {
+                hitpoints.Add(ray.point);
+            }
+            testRay = false;
         }
         if(clear)
         {
@@ -60,6 +91,7 @@ public class CornerChecker : MonoBehaviour
     }
     public IEnumerator Generate()
     {
+        hitpoints.Clear();
         foreach (GameObject corner in Corners)
         {
             DestroyImmediate(corner);
@@ -69,9 +101,10 @@ public class CornerChecker : MonoBehaviour
             for (int y = 0; y < CheckWidth; y++)
             {
                 Vector2 originPos = new Vector2(OriginPoint.position.x + x * Steps, OriginPoint.position.y + y * Steps);
-                if (HasCorner(originPos, false))
+                Vector2 cornerPos = new Vector2();
+                if (HasCorner(originPos, true, out cornerPos))
                 {
-                    GameObject cornerIndicator = Instantiate(CornerObject, originPos, Quaternion.identity);
+                    GameObject cornerIndicator = Instantiate(CornerObject, cornerPos, Quaternion.identity);
                     Corners.Add(cornerIndicator);
                 }
                 //yield return new WaitForEndOfFrame();
@@ -81,22 +114,24 @@ public class CornerChecker : MonoBehaviour
         Debug.Log("UpdatedCorners");
     }
 
-    public bool HasCorner(Vector2 originPos, bool test)
+    public bool HasCorner(Vector2 originPos, bool test, out Vector2 cornerPos)
     {
         Vector2 rayOrigin;
-        float lenght = ExtraLenght;
-        float basicLenght = Mathf.Sqrt(1f);
+       
 
-        foreach(RayClass rayClass in rayClasses)
+        foreach(RayClass rayClass in realRayClasses)
         {
-            bool long1 = CheckRaycast(originPos + rayClass.origin, rayClass.direction1, rayClass.color1, basicLenght, test);
-            bool check1 = CheckRaycast(originPos + rayClass.origin + rayClass.direction1, rayClass.direction1, rayClass.color2, lenght, test);
+            float lenght = ExtraLenght;
+            float basicLenght = Mathf.Sqrt(Mathf.Abs(rayClass.direction1.x - rayClass.direction1.y) - ExtraLenght);
 
 
-            bool long2 = CheckRaycast(originPos + rayClass.origin, rayClass.direction2, rayClass.color1, basicLenght, test);
-            bool check2 = CheckRaycast(originPos + rayClass.origin + rayClass.direction2, rayClass.direction2, rayClass.color2, lenght, test);
+            bool long1 = CheckRaycast(originPos + rayClass.origin, rayClass.direction1, rayClass.color1, basicLenght, test, false);
+            bool long2 = CheckRaycast(originPos + rayClass.origin, rayClass.direction2, rayClass.color1, basicLenght, test, false);
 
-            if (check1 == true && check2 == true)
+            bool check1 = CheckRaycast(originPos + rayClass.origin + rayClass.direction1, rayClass.direction1, rayClass.color2, lenght, test, true);
+            bool check2 = CheckRaycast(originPos + rayClass.origin + rayClass.direction2, rayClass.direction2, rayClass.color2, lenght, test, true);
+
+            if (check1 == true && check2 == true && long1 == false && long2 == false)
             {
                 rayOrigin = originPos + rayClass.origin;
                 Debug.DrawRay(rayOrigin, rayClass.direction1 * basicLenght, rayClass.color1, 2);
@@ -109,16 +144,27 @@ public class CornerChecker : MonoBehaviour
 
                 rayOrigin = originPos + rayClass.origin + rayClass.direction2;
                 Debug.DrawRay(rayOrigin, rayClass.direction2 * lenght, rayClass.color2, 2);
+
+                RaycastHit2D ray = Physics2D.Raycast(originPos + rayClass.origin, originPos - (originPos + rayClass.origin), 5, CollisionMask);
+                Debug.DrawRay(originPos + rayClass.origin, (originPos - (originPos + rayClass.origin)) * 10, Color.white, 2);
+                if (ray)
+                {
+                    cornerPos = ray.point;
+                } else
+                {
+                    cornerPos = Vector2.zero;
+                }
+
                 return true;
             }
-            if (long1 && long2)
-            {
-                Debug.LogError("LONG TRUE");
-                rayOrigin = originPos + rayClass.origin;
-                Debug.DrawRay(rayOrigin, rayClass.direction1 * basicLenght, rayClass.color1, 2);
-                rayOrigin = originPos + rayClass.origin;
-                Debug.DrawRay(rayOrigin, rayClass.direction2 * basicLenght, rayClass.color1, 2);
-            }
+            //if (long1 == false && long2 == false)
+            //{
+            //    Debug.LogError("LONG TRUE");
+            //    rayOrigin = originPos + rayClass.origin;
+            //    Debug.DrawRay(rayOrigin, rayClass.direction1 * basicLenght, rayClass.color1, 2);
+            //    rayOrigin = originPos + rayClass.origin;
+            //    Debug.DrawRay(rayOrigin, rayClass.direction2 * basicLenght, rayClass.color1, 2);
+            //}
         }
         #region Old
         //bool long6 = CheckRaycast(originPos + new Vector2(-1, 1), new Vector2(2, -1), Color.cyan, basicLenght, test);
@@ -206,18 +252,30 @@ public class CornerChecker : MonoBehaviour
         //    return true;
         //}
         #endregion
+        cornerPos = Vector2.zero;
         return false;
     }
 
-    public bool CheckRaycast(Vector2 origin, Vector2 direction, Color color, float lenght, bool test)
+    public bool CheckRaycast(Vector2 origin, Vector2 direction, Color color, float lenght, bool test, bool check)
     {
-        RaycastHit2D ray = Physics2D.Raycast(origin, direction, lenght, CollisionMask);
+
+        RaycastHit2D ray = new RaycastHit2D();
+        if (check)
+        {
+            ray = Physics2D.Raycast(origin, direction, lenght, CollisionMask);
+        }
+        else
+        {
+            ray = Physics2D.Raycast(origin, direction, direction.magnitude - ExtraLenght, CollisionMask);
+        }
+      
         if (test)
         {
-            Debug.DrawRay(origin, direction * lenght, color, 0.1f);
+            Debug.DrawRay(origin, direction * lenght, color, 2);
         }
-        if(ray.collider != null)
+        if(ray)
         {
+            hitpoints.Add(ray.point);
             return true;
         } else
         {
