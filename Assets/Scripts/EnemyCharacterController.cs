@@ -7,10 +7,9 @@ public class EnemyCharacterController : ObjectController
 {
     public Transform StartPoint;
     public Transform EndPoint;
-    private float _currentSpeed;
+    public float CurrentSpeed;
     public Vector2 _target;
     public bool CanCrawl;
-    private Vector2 _targetOverride;
     public Transform Armature;
     [HideInInspector]
     public EnemyData EData;
@@ -150,14 +149,14 @@ public class EnemyCharacterController : ObjectController
             {
                 if (ExternalForce.x != 0 && Mathf.Sign(ExternalForce.x) != Mathf.Sign(directionX))
                 {
-                    ExternalForce.x += directionX * (1 / acc) * _currentSpeed * Time.fixedDeltaTime;
+                    ExternalForce.x += directionX * (1 / acc) * CurrentSpeed * Time.fixedDeltaTime;
                 }
                 else
                 {
-                    if (Mathf.Abs(Speed.x) < _currentSpeed)
+                    if (Mathf.Abs(Speed.x) < CurrentSpeed)
                     {
-                        Speed.x += directionX * (1 / acc) * _currentSpeed * Time.fixedDeltaTime;
-                        Speed.x = Mathf.Min(Mathf.Abs(Speed.x), _currentSpeed * Mathf.Abs(directionX)) *
+                        Speed.x += directionX * (1 / acc) * CurrentSpeed * Time.fixedDeltaTime;
+                        Speed.x = Mathf.Min(Mathf.Abs(Speed.x), CurrentSpeed * Mathf.Abs(directionX)) *
                             Mathf.Sign(Speed.x);
                     }
                 }
@@ -165,13 +164,13 @@ public class EnemyCharacterController : ObjectController
             }
             else
             {
-                Speed.x = _currentSpeed * directionX;
+                Speed.x = CurrentSpeed * directionX;
             }
             if (directionX == 0 || Mathf.Sign(directionX) != Mathf.Sign(Speed.x))
             {
                 if (dec > 0)
                 {
-                    Speed.x = Mathf.MoveTowards(Speed.x, 0, (1 / dec) * _currentSpeed * Time.fixedDeltaTime);
+                    Speed.x = Mathf.MoveTowards(Speed.x, 0, (1 / dec) * CurrentSpeed * Time.fixedDeltaTime);
                 }
                 else
                 {
@@ -182,9 +181,9 @@ public class EnemyCharacterController : ObjectController
     }
     public void SetSpeed(float speed)
     {
-        _currentSpeed = speed;
+        CurrentSpeed = speed;
     }
-    public void SetTarget(Vector2 target)
+    public virtual void SetTarget(Vector2 target)
     {
         _target = target;
     }

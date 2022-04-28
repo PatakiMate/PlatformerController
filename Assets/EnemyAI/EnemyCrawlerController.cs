@@ -1,13 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public class EnemyLocustController : EnemyCharacterController
+public class EnemyCrawlerController : EnemyCharacterController
 {
-    private Vector2 _targetOverride;
-    private bool _crawling;
-    public bool _climbing;
+    private Vector2 _partTarget;
+    public float ReachDistance;
 
     public override void Start()
     {
@@ -21,99 +21,47 @@ public class EnemyLocustController : EnemyCharacterController
         RunTimer();
     }
 
-    public override void FixedUpdate()
+    public Vector2 GetClosestCorner()
     {
-        base.FixedUpdate();
-        if (CanCrawl == false)
+        Vector2 closest = new Vector2(1000, 1000);
+        List<GameObject> corners = new List<GameObject>();
+        foreach (GameObject corner in CornerChecker.Instance.Corners)
         {
-            if (Mathf.Abs(transform.position.x - _target.x) > 0.5f)
-            {
-                Walk(transform.position.x < _target.x ? 1 : -1);
-            }
+            corners.Add(corner);
+        }
+
+        corners = corners.OrderBy(x => Vector2.Distance(this.transform.position, x.transform.position)).ToList();
+        if (Vector2.Distance(corners[0].transform.position, Player.transform.position) < Vector2.Distance(corners[1].transform.position, Player.transform.position))
+        {
+            closest = corners[0].transform.position;
         }
         else
         {
-            bool shouldClimb = false;
-            if (transform.position.x < _target.x && transform.position.x < Collisions.hHit.point.x)
-            {
-                shouldClimb = true;
-            }
-            if (transform.position.x > _target.x && transform.position.x > Collisions.hHit.point.x)
-            {
-                shouldClimb = true;
-            }
-            //BOTH
-            if (Collisions.hHit && Collisions.vHit)
-            {
-                _climbing = false;
-                if (Mathf.Abs(transform.position.x - _target.x) > Mathf.Abs(transform.position.y - _target.y) && shouldClimb == false)
-                {
-                    _crawling = false;
-                    Walk(transform.position.x < _target.x ? 1 : -1, 0);
-                }
-                else
-                {
-                    _crawling = true;
-                    if (shouldClimb)
-                    {
-                        _targetOverride = new Vector2(0, transform.position.y + 1000);
-                        _climbing = true;
-                    }
-                    Walk(0, transform.position.y < _target.y ? 1 : -1);
-                }
-            }
-            //HORIZONTAL
-            if (!Collisions.hHit && Collisions.vHit)
-            {
-                Debug.Log("HORIZONTAL");
-                _crawling = false;
-                Walk(transform.position.x < _target.x ? 1 : -1, 0);
-            }
-            //VERTICAL
-            if (Collisions.hHit && !Collisions.vHit)
-            {
-                _crawling = true;
-                if (shouldClimb)
-                {
-                    _targetOverride = new Vector2(0, transform.position.y + 1000);
-                    _climbing = true;
-                }
-                Walk(0, transform.position.y < _target.y ? 1 : -1);
-            }
-            //NONE
-            if (!Collisions.hHit && !Collisions.vHit)
-            {
-                if (_crawling)
-                {
-                    Walk(transform.position.x < _target.x ? 1 : -1, 0);
-                }
-                _crawling = false;
-                _climbing = false;
-            }
+            closest = corners[1].transform.position;
         }
-        if (_climbing == false)
+        return closest;
+    }
+
+    public override void FixedUpdate()
+    {
+        base.FixedUpdate();
+        if (_partTarget.y > transform.position.y)
         {
-            _targetOverride = Vector2.zero;
-            SetTarget(_target);
+            Walk(0, transform.position.y < _target.y ? 1 : -1);
+        } else
+        {
+            Walk(transform.position.x < _target.x ? 1 : -1, 0);
+        }
+        if(Vector2.Distance(transform.position, _partTarget) < ReachDistance)
+        {
+            _partTarget = GetClosestCorner();
         }
     }
 
 
     protected override void UpdateGravity()
     {
-        if (_crawling)
-        {
-            return;
-        }
-        float g = PConfig.Gravity * GravityScale * Time.fixedDeltaTime;
-        if (Speed.y > 0)
-        {
-            Speed.y += g;
-        }
-        else
-        {
-            ExternalForce.y += g;
-        }
+        return;
     }
     public override Vector2 Move(Vector2 deltaMove)
     {
@@ -236,9 +184,6 @@ public class EnemyLocustController : EnemyCharacterController
     public override void SetTarget(Vector2 target)
     {
         _target = target;
-        if(_climbing)
-        {
-            _target.y = _targetOverride.y;
-        }
+        _partTarget = GetClosestCorner();
     }
 }

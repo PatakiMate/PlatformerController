@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [ExecuteInEditMode]
-public class CornerChecker : MonoBehaviour
+public class CornerChecker : Singleton<CornerChecker>
 {
     public bool update;
     public bool clear;
