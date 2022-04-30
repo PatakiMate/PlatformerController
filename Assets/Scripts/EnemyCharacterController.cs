@@ -21,6 +21,7 @@ public class EnemyCharacterController : ObjectController
     public LayerMask HitLayer;
     public Action AnimHit;
     public float MeleeCooldownTimer;
+    public bool Following;
 
     public override void Start()
     {

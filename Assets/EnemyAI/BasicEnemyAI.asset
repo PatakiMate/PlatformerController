@@ -57,12 +57,12 @@ MonoBehaviour:
   state: 0
   started: 0
   guid: 28c72902a72c78d4a9dafd3f481bbee7
-  position: {x: 0.000030517578, y: 349.18228}
+  position: {x: 0.000009536743, y: 349}
   blackboard: {fileID: 0}
   description: 
   drawGizmos: 0
   MaxDistance: 10
-  ReachedDistance: 2
+  ReachedDistance: 3
 --- !u!114 &-5207307355272441329
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -172,7 +172,28 @@ MonoBehaviour:
   - {fileID: -6843489746904426788}
   - {fileID: -7580228698137891829}
   - {fileID: 7128262663957551825}
+  - {fileID: 5477854486100673113}
   blackboard: {fileID: 11400000, guid: 46c6198e652b79944a7603a2ad26b272, type: 2}
+--- !u!114 &5477854486100673113
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e6afcc41878085469341a2e0bb55178, type: 3}
+  m_Name: EnemyChargeAttack
+  m_EditorClassIdentifier: 
+  state: 0
+  started: 0
+  guid: 9b1d92bf5204a224e81cd493fe17c79b
+  position: {x: 310, y: 349}
+  blackboard: {fileID: 0}
+  description: 
+  drawGizmos: 0
+  timer: 0
 --- !u!114 &7128262663957551825
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -194,7 +215,7 @@ MonoBehaviour:
   drawGizmos: 0
   children:
   - {fileID: -5464935738309913899}
-  - {fileID: -7580228698137891829}
+  - {fileID: 5477854486100673113}
 --- !u!114 &8962529097396514345
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -217,5 +238,5 @@ MonoBehaviour:
   TargetPosition: {x: 0, y: 0}
   ReachedDistance: 1
   RecognizeDistance: 0
-  RecognizeDistanceFace: 4
-  RecognizeDistanceBack: 1
+  RecognizeDistanceFace: 100
+  RecognizeDistanceBack: 100

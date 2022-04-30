@@ -44,11 +44,13 @@ public class EnemyFollowPlayer : ActionNode
         //}
         if(TargetDistance(context.enemyController.Player.transform.position) < ReachedDistance)
         {
+            context.enemyController.Following = false;
             //context.enemyController.Animator.SetTrigger("hit");
             return State.Success;
         }
         if (TargetDistance(context.enemyController.Player.transform.position) < MaxDistance)
         {
+            context.enemyController.Following = true;
             if (context.enemyController.CanCrawl)
             {
                 //Debug.LogError("SET TARGET PLAYER");
@@ -61,6 +63,7 @@ public class EnemyFollowPlayer : ActionNode
         }
         if (TargetDistance(context.enemyController.Player.transform.position) > MaxDistance)
         {
+            context.enemyController.Following = false;
             return State.Failure;
         }
         return State.Failure;

@@ -26,7 +26,7 @@ public class ObjectController : MonoBehaviour
     [SerializeField]
     protected Vector2 Speed = Vector2.zero;
     [SerializeField]
-    protected Vector2 ExternalForce = Vector2.zero;
+    public Vector2 ExternalForce = Vector2.zero;
     protected float HorizontalRaySpacing;
     protected float HorizontalRayCount;
     protected float VerticalRaySpacing;
