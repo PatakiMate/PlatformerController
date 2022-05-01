@@ -15,7 +15,7 @@ MonoBehaviour:
   state: 0
   started: 0
   guid: b1cd3f68e491d35448dc6e92a263e56f
-  position: {x: 149.99995, y: 349.18228}
+  position: {x: 149.99997, y: 349}
   blackboard: {fileID: 0}
   description: 
   drawGizmos: 0
@@ -62,7 +62,7 @@ MonoBehaviour:
   description: 
   drawGizmos: 0
   MaxDistance: 10
-  ReachedDistance: 3
+  ReachedDistance: 4
 --- !u!114 &-5207307355272441329
 MonoBehaviour:
   m_ObjectHideFlags: 0

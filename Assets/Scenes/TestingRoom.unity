@@ -6085,6 +6085,7 @@ MonoBehaviour:
   CanUseSlopes: 1
   DirectionChangeLerpTime: 15
   MeleeCooldownTime: 3
+  ChargeCooldownTime: 0
 --- !u!114 &1283723284
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6150,7 +6151,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 2048
   MeleeCooldownTimer: 0
+  ChargeCooldownTimer: 0
   Following: 0
+  Charge: 0
+  Block: 0
   ReachDistance: 0.3
   Distance: 0
   CurrentTargetPoint: {fileID: 0}
@@ -6177,7 +6181,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!212 &1283931611
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -6259,7 +6263,7 @@ MonoBehaviour:
   Reached: 0.1
   Distance: 0
   target: {fileID: 750745537710206590}
-  LastPoint: {fileID: 458297537}
+  LastPoint: {fileID: 215255718}
   speed: 5
   goingVertical: 0
   negative: 1
@@ -8119,7 +8123,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1842638468
 Transform:
   m_ObjectHideFlags: 0
@@ -8167,6 +8171,7 @@ MonoBehaviour:
   CanUseSlopes: 1
   DirectionChangeLerpTime: 15
   MeleeCooldownTime: 3
+  ChargeCooldownTime: 3
 --- !u!114 &1842638471
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8204,7 +8209,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 2048
   MeleeCooldownTimer: 0
+  ChargeCooldownTimer: 0
   Following: 0
+  Charge: 0
+  Block: 0
   _climbing: 0
 --- !u!50 &1842638472
 Rigidbody2D:
@@ -10862,7 +10870,7 @@ MonoBehaviour:
   m_ZDamping: 1
   m_ScreenX: 0.5
   m_ScreenY: 0.5
-  m_CameraDistance: 10
+  m_CameraDistance: 14
   m_DeadZoneWidth: 0
   m_DeadZoneHeight: 0
   m_DeadZoneDepth: 0
@@ -10985,7 +10993,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6849151200803095722}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -30.89, y: 4.03, z: -10}
+  m_LocalPosition: {x: -30.89, y: 4.03, z: -14}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 3873791634080511502}
@@ -11042,7 +11050,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6849151200907764605}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -30.89, y: 4.03, z: -10}
+  m_LocalPosition: {x: -30.89, y: 4.03, z: -14}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 6849151200537526489}

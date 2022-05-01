@@ -27,7 +27,7 @@ public class CrawlerTestMovement : MonoBehaviour
         Distance = Vector2.Distance(transform.position, partTarget);
         if (Vector2.Distance(transform.position, partTarget) < Reached)
         {
-            goingVertical = !goingVertical;
+            //goingVertical = !goingVertical;
             partTarget = GetNextPoint();
         }
 
@@ -44,24 +44,35 @@ public class CrawlerTestMovement : MonoBehaviour
     public Vector2 GetNextPoint()
     {
         corners.Clear();
+        bool addingVertical = false;
         foreach (GameObject corner in CornerChecker.Instance.Corners)
         {
-            if (goingVertical)
+            if (corner.transform.position.x == LastPoint.transform.position.x && corner != LastPoint)
             {
-                if (corner.transform.position.x == LastPoint.transform.position.x)
-                {
-                    corners.Add(corner);
-                }
+                addingVertical = true;
+                corners.Add(corner);
             }
-            else
+            if (corner.transform.position.y == LastPoint.transform.position.y)
             {
-                if (corner.transform.position.y == LastPoint.transform.position.y)
-                {
-                    corners.Add(corner);
-                }
+                corners.Add(corner);
             }
         }
-        if (goingVertical == false)
+        if (addingVertical)
+        {
+            List<GameObject> removables = new List<GameObject>();
+            foreach (GameObject corner in corners)
+            {
+               if( corner.transform.position.x != LastPoint.transform.position.x)
+                {
+                    removables.Add(corner);
+                }
+            }
+            foreach (GameObject removable in removables)
+            {
+                corners.Remove(removable);
+            }
+        }
+        if (addingVertical == false)
         {
             List<GameObject> removables = new List<GameObject>();
             foreach (GameObject corner in corners)

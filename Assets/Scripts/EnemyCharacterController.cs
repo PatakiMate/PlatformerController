@@ -21,7 +21,10 @@ public class EnemyCharacterController : ObjectController
     public LayerMask HitLayer;
     public Action AnimHit;
     public float MeleeCooldownTimer;
+    public float ChargeCooldownTimer;
     public bool Following;
+    public bool Charge;
+    public bool Block;
 
     public override void Start()
     {
@@ -204,6 +207,10 @@ public class EnemyCharacterController : ObjectController
         if(MeleeCooldownTimer > 0)
         {
             MeleeCooldownTimer -= Time.deltaTime;
+        }
+        if (ChargeCooldownTimer > 0)
+        {
+            ChargeCooldownTimer -= Time.deltaTime;
         }
     }
 }

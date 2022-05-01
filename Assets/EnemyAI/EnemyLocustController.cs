@@ -61,7 +61,7 @@ public class EnemyLocustController : EnemyCharacterController
                         _targetOverride = new Vector2(0, transform.position.y + 1000);
                         _climbing = true;
                     }
-                    Walk(0, transform.position.y < _target.y ? 1 : -1);
+                    Walk(transform.position.x < _target.x ? 1 : -1, transform.position.y < _target.y ? 1 : -1);
                 }
             }
             //HORIZONTAL
@@ -70,6 +70,7 @@ public class EnemyLocustController : EnemyCharacterController
                 Debug.Log("HORIZONTAL");
                 _crawling = false;
                 Walk(transform.position.x < _target.x ? 1 : -1, 0);
+                Debug.LogError("DIRECTION: " + (transform.position.x < _target.x ? 1 : -1).ToString());
             }
             //VERTICAL
             if (Collisions.hHit && !Collisions.vHit)
@@ -80,7 +81,12 @@ public class EnemyLocustController : EnemyCharacterController
                     _targetOverride = new Vector2(0, transform.position.y + 1000);
                     _climbing = true;
                 }
-                Walk(0, transform.position.y < _target.y ? 1 : -1);
+                if (Mathf.Abs(transform.position.y - _target.y) < Mathf.Abs(transform.position.x - _target.x))
+                {
+                    _targetOverride = new Vector2(0, transform.position.y + 1000);
+                    _climbing = true;
+                }
+                Walk(transform.position.x < _target.x ? 1 : -1, transform.position.y < _target.y ? 1 : -1);
             }
             //NONE
             if (!Collisions.hHit && !Collisions.vHit)
@@ -105,7 +111,7 @@ public class EnemyLocustController : EnemyCharacterController
 
     protected override void UpdateGravity()
     {
-        if (_crawling)
+        if (_crawling || Charge)
         {
             return;
         }
@@ -179,6 +185,10 @@ public class EnemyLocustController : EnemyCharacterController
 
     public override void Walk(float directionX, float directionY = 0)
     {
+        if(Block)
+        {
+            return;
+        }
         if (Collisions.onSlope && Collisions.groundAngle > MaxSlopeAngle && Collisions.groundAngle < MinWallAngle)
         {
             directionX = 0;
@@ -197,47 +207,81 @@ public class EnemyLocustController : EnemyCharacterController
 
 
         //XXX
-        if (Mathf.Abs(transform.position.x - _target.x) > 0.5f)
-        {
-            Speed.x = CurrentSpeed * directionX;
-            //if (acc > 0)
-            //{
-            //    if (ExternalForce.x != 0 && Mathf.Sign(ExternalForce.x) != Mathf.Sign(directionX))
-            //    {
-            //        ExternalForce.x += directionX * (1 / acc) * CurrentSpeed * Time.fixedDeltaTime;
-            //    }
-            //    else
-            //    {
-            //        if (Mathf.Abs(Speed.x) < CurrentSpeed)
-            //        {
-            //            Speed.x += directionX * (1 / acc) * CurrentSpeed * Time.fixedDeltaTime;
-            //            Speed.x = Mathf.Min(Mathf.Abs(Speed.x), CurrentSpeed * Mathf.Abs(directionX)) *
-            //                Mathf.Sign(Speed.x);
-            //        }
-            //    }
+        //if (Mathf.Abs(transform.position.x - _target.x) > 0.5f)
+        //{
+            //Speed.x = CurrentSpeed * directionX;
+            if (acc > 0)
+            {
+                if (ExternalForce.x != 0 && Mathf.Sign(ExternalForce.x) != Mathf.Sign(directionX))
+                {
+                    ExternalForce.x += directionX * (1 / acc) * CurrentSpeed * Time.fixedDeltaTime;
+                }
+                else
+                {
+                    if (Mathf.Abs(Speed.x) < CurrentSpeed)
+                    {
+                        Speed.x += directionX * (1 / acc) * CurrentSpeed * Time.fixedDeltaTime;
+                        Speed.x = Mathf.Min(Mathf.Abs(Speed.x), CurrentSpeed * Mathf.Abs(directionX)) *
+                            Mathf.Sign(Speed.x);
+                    }
+                }
 
-            //}
-            //else
-            //{
-            //    Speed.x = CurrentSpeed * directionX;
-            //}
-            //if (directionX == 0 || Mathf.Sign(directionX) != Mathf.Sign(Speed.x))
-            //{
-            //    if (dec > 0)
-            //    {
-            //        Speed.x = Mathf.MoveTowards(Speed.x, 0, (1 / dec) * CurrentSpeed * Time.fixedDeltaTime);
-            //    }
-            //    else
-            //    {
-            //        Speed.x = 0;
-            //    }
-            //}
-        }
+            }
+            else
+            {
+                Speed.x = CurrentSpeed * directionX;
+            }
+            if (directionX == 0 || Mathf.Sign(directionX) != Mathf.Sign(Speed.x))
+            {
+                if (dec > 0)
+                {
+                    Speed.x = Mathf.MoveTowards(Speed.x, 0, (1 / dec) * CurrentSpeed * Time.fixedDeltaTime);
+                }
+                else
+                {
+                    Speed.x = 0;
+                }
+            }
+        //}
 
-        if (CanCrawl && Mathf.Abs(transform.position.y - _target.y) > 0.5f)
+        if (CanCrawl/* && Mathf.Abs(transform.position.y - _target.y) > 0.5f*/)
         {
             //YYY
-            Speed.y = CurrentSpeed * directionY;
+
+            if (accY > 0)
+            {
+                if (ExternalForce.y != 0 && Mathf.Sign(ExternalForce.y) != Mathf.Sign(directionY))
+                {
+                    ExternalForce.y += directionY * (1 / accY) * CurrentSpeed * Time.fixedDeltaTime;
+                }
+                else
+                {
+                    if (Mathf.Abs(Speed.y) < CurrentSpeed)
+                    {
+                        Speed.y += directionY * (1 / accY) * CurrentSpeed * Time.fixedDeltaTime;
+                        Speed.y = Mathf.Min(Mathf.Abs(Speed.y), CurrentSpeed * Mathf.Abs(directionY)) *
+                            Mathf.Sign(Speed.y);
+                    }
+                }
+
+            }
+            else
+            {
+                Speed.y = CurrentSpeed * directionY;
+            }
+            if (directionY == 0 || Mathf.Sign(directionY) != Mathf.Sign(Speed.y))
+            {
+                if (decY > 0)
+                {
+                    Speed.y = Mathf.MoveTowards(Speed.y, 0, (1 / decY) * CurrentSpeed * Time.fixedDeltaTime);
+                }
+                else
+                {
+                    Speed.y = 0;
+                }
+            }
+
+            //Speed.y = CurrentSpeed * directionY;
         }
     }
     public override void SetTarget(Vector2 target)

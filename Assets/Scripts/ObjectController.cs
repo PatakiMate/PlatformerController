@@ -24,7 +24,7 @@ public class ObjectController : MonoBehaviour
     protected BoxCollider2D MyCollider;
     protected PhysicsConfig PConfig;
     [SerializeField]
-    protected Vector2 Speed = Vector2.zero;
+    public Vector2 Speed = Vector2.zero;
     [SerializeField]
     public Vector2 ExternalForce = Vector2.zero;
     protected float HorizontalRaySpacing;
@@ -281,7 +281,8 @@ public class ObjectController : MonoBehaviour
         float directionX = Mathf.Sign(deltaMove.x);
         if (this.gameObject.tag != "Player")
         {
-            directionX = FacingRight ? 1 : -1;
+            //directionX = FacingRight ? 1 : -1;
+            Debug.LogError("CHECK DIRECTION: " + directionX);
         }
         float rayLength = Mathf.Abs(deltaMove.x) + SkinWidth;
         for (int i = 0; i < HorizontalRayCount; i++)

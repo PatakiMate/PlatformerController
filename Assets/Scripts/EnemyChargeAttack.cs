@@ -5,42 +5,59 @@ using TheKiwiCoder;
 
 public class EnemyChargeAttack : ActionNode
 {
-    private Transform _hitOrigin;
-    private LayerMask _hitMask;
-    private float _rayLenght = 0.5f;
     private float time = 0.2f;
     public float timer;
     private bool _startedOnCooldown;
+
+    private float resetTimer;
+    private float resetTime = 0.2f;
     protected override void OnStart()
     {
         timer = 0;
-        _hitOrigin = context.enemyController.MeleeHitPoint;
-        _hitMask = context.enemyController.HitLayer;
-        //context.enemyController.ExternalForce = (context.enemyController.Player.transform.position - context.transform.position) * 5;
-    }
-
-    private void Hit()
-    {
-        RaycastHit2D hit1 = Physics2D.Raycast(_hitOrigin.position, Vector2.up, _rayLenght, _hitMask);
-        Debug.DrawRay(_hitOrigin.position, Vector2.up * _rayLenght, Color.blue, 2);
-        RaycastHit2D hit2 = Physics2D.Raycast(_hitOrigin.position, Vector2.left, _rayLenght, _hitMask);
-        Debug.DrawRay(_hitOrigin.position, Vector2.left * _rayLenght, Color.blue, 2);
-        RaycastHit2D hit3 = Physics2D.Raycast(_hitOrigin.position, Vector2.right, _rayLenght, _hitMask);
-        Debug.DrawRay(_hitOrigin.position, Vector2.right * _rayLenght, Color.blue, 2);
-        if (hit1.collider?.tag == "Player" || hit2.collider?.tag == "Player" || hit3.collider?.tag == "Player")
+        context.enemyController.Block = true;
+        if (context.enemyController.MeleeCooldownTimer > 0)
         {
-            Debug.Log("Player Hit");
+            _startedOnCooldown = true;
         }
-
+        else
+        {
+            _startedOnCooldown = false;
+            context.enemyController.MeleeCooldownTimer = context.enemyController.EData.ChargeCooldownTime;
+            resetTimer = resetTime;
+            context.enemyController.Charge = true;
+            context.enemyController.Speed = (context.enemyController.Player.transform.position - context.transform.position) * 4;
+        }
+       
     }
 
     protected override void OnStop()
     {
-        context.enemyController.AnimHit -= Hit;
+        context.enemyController.Block = false;
     }
 
     protected override State OnUpdate()
     {
+
+        if(resetTimer > 0)
+        {
+            resetTimer -= Time.deltaTime;
+        } else
+        {
+            context.enemyController.Charge = false;
+        }
+
+        if (_startedOnCooldown && resetTimer == 0)
+        {
             return State.Success;
+        }
+        if (timer < time)
+        {
+            timer += Time.deltaTime;
+            return State.Running;
+        }
+        else
+        {
+            return State.Success;
+        }
     }
 }
