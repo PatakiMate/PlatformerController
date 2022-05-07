@@ -23,9 +23,6 @@ public class CornerChecker : Singleton<CornerChecker>
     public List<RayClass> realRayClasses = new List<RayClass>();
 
     private List<Vector2> hitpoints = new List<Vector2>();
-
-    public Transform TestObject1;
-    public Transform TestObject2;
     public bool testRay;
     public float divider;
 
@@ -62,17 +59,6 @@ public class CornerChecker : Singleton<CornerChecker>
             HasCorner(Vector2.zero, true, out cornerpos);
             test = false;
         }
-        if(testRay)
-        {
-            hitpoints.Clear();
-            RaycastHit2D ray = Physics2D.Raycast(TestObject1.position, TestObject2.position - TestObject1.position, Vector2.Distance(TestObject1.position, TestObject2.position), CollisionMask);
-            Debug.DrawRay(TestObject1.position, (TestObject2.position - TestObject1.position), Color.blue, 2);
-            if(ray)
-            {
-                hitpoints.Add(ray.point);
-            }
-            testRay = false;
-        }
         if(clear)
         {
             foreach(GameObject corner in Corners)
@@ -105,6 +91,7 @@ public class CornerChecker : Singleton<CornerChecker>
                 if (HasCorner(originPos, true, out cornerPos))
                 {
                     GameObject cornerIndicator = Instantiate(CornerObject, cornerPos, Quaternion.identity);
+                    cornerIndicator.name = "CornerIndicator" + "(" + Corners.Count + ")";
                     Corners.Add(cornerIndicator);
                 }
                 //yield return new WaitForEndOfFrame();
@@ -154,104 +141,9 @@ public class CornerChecker : Singleton<CornerChecker>
                 {
                     cornerPos = Vector2.zero;
                 }
-
                 return true;
             }
-            //if (long1 == false && long2 == false)
-            //{
-            //    Debug.LogError("LONG TRUE");
-            //    rayOrigin = originPos + rayClass.origin;
-            //    Debug.DrawRay(rayOrigin, rayClass.direction1 * basicLenght, rayClass.color1, 2);
-            //    rayOrigin = originPos + rayClass.origin;
-            //    Debug.DrawRay(rayOrigin, rayClass.direction2 * basicLenght, rayClass.color1, 2);
-            //}
         }
-        #region Old
-        //bool long6 = CheckRaycast(originPos + new Vector2(-1, 1), new Vector2(2, -1), Color.cyan, basicLenght, test);
-        //bool check7 = CheckRaycast(originPos + new Vector2(-1, 1) + new Vector2(2, -1), new Vector2(2, -1), Color.blue, lenght, test);
-
-
-        //bool long8 = CheckRaycast(originPos + new Vector2(-1, 1), new Vector2(1, -2), Color.cyan, basicLenght, test);
-        //bool short9 = CheckRaycast(originPos + new Vector2(-1, 1) + new Vector2(1, -2), new Vector2(1, -2), Color.blue, lenght, test);
-
-        //if (long6 == false && check7 == true && long8 == false && short9 == true)
-        //{
-        //    rayOrigin = originPos + new Vector2(-1, 1) + new Vector2(2, -1);
-        //    Debug.DrawRay(rayOrigin, new Vector2(2, -1) * lenght, Color.blue, 2);
-        //    rayOrigin = originPos + new Vector2(-1, 1) + new Vector2(1, -2);
-        //    Debug.DrawRay(rayOrigin, new Vector2(1, -2) * lenght, Color.blue, 2);
-        //    return true;
-        //}
-
-
-        //rayOrigin = originPos + new Vector2(1, 1) + new Vector2(-2, -1);
-        //RaycastHit2D hit3 = Physics2D.Raycast(rayOrigin, new Vector2(-2, -1), lenght, CollisionMask);
-        //if (test)
-        //{
-        //    Debug.DrawRay(rayOrigin, new Vector2(-2, -1) * lenght, Color.green, 0.1f);
-        //}
-
-        //rayOrigin = originPos + new Vector2(1, 1) + new Vector2(-1, -2);
-        //RaycastHit2D hit4 = Physics2D.Raycast(rayOrigin, new Vector2(-1, -2), lenght, CollisionMask);
-        //if (test)
-        //{
-        //    Debug.DrawRay(rayOrigin, new Vector2(-1, -2) * lenght, Color.green, 0.1f);
-        //}
-        //if (hit3 && hit4)
-        //{
-        //    rayOrigin = originPos + new Vector2(1, 1) + new Vector2(-2, -1);
-        //    Debug.DrawRay(rayOrigin, new Vector2(-2, -1) * lenght, Color.green, 2);
-        //    rayOrigin = originPos + new Vector2(1, 1) + new Vector2(-1, -2);
-        //    Debug.DrawRay(rayOrigin, new Vector2(-1, -2) * lenght, Color.green, 2);
-        //    return true;
-        //}
-
-
-        //rayOrigin = originPos + new Vector2(-1, -1) + new Vector2(1, 2);
-        //RaycastHit2D hit5 = Physics2D.Raycast(rayOrigin, new Vector2(1, 2), lenght, CollisionMask);
-        //if (test)
-        //{
-        //    Debug.DrawRay(rayOrigin, new Vector2(1, 2) * lenght, Color.red, 0.1f);
-        //}
-
-        //rayOrigin = originPos + new Vector2(-1, -1) + new Vector2(2, 1);
-        //RaycastHit2D hit6 = Physics2D.Raycast(rayOrigin, new Vector2(2, 1), lenght, CollisionMask);
-        //if (test)
-        //{
-        //    Debug.DrawRay(rayOrigin, new Vector2(2, 1) * lenght, Color.red, 0.1f);
-        //}
-        //if (hit5 && hit6)
-        //{
-        //    rayOrigin = originPos + new Vector2(-1, -1) + new Vector2(1, 2);
-        //    Debug.DrawRay(rayOrigin, new Vector2(1, 2) * lenght, Color.red, 2);
-        //    rayOrigin = originPos + new Vector2(-1, -1) + new Vector2(2, 1);
-        //    Debug.DrawRay(rayOrigin, new Vector2(2, 1) * lenght, Color.red, 2);
-        //    return true;
-        //}
-
-
-        //rayOrigin = originPos + new Vector2(1, -1) + new Vector2(-1, 2);
-        //RaycastHit2D hit7 = Physics2D.Raycast(rayOrigin, new Vector2(-1, 2), lenght, CollisionMask);
-        //if (test)
-        //{
-        //    Debug.DrawRay(rayOrigin, new Vector2(-1, 2) * lenght, Color.magenta, 0.1f);
-        //}
-
-        //rayOrigin = originPos + new Vector2(1, -1) + new Vector2(-2, 1);
-        //RaycastHit2D hit8 = Physics2D.Raycast(rayOrigin, new Vector2(-2, 1), lenght, CollisionMask);
-        //if (test)
-        //{
-        //    Debug.DrawRay(rayOrigin, new Vector2(-2, 1) * lenght, Color.magenta, 0.1f);
-        //}
-        //if (hit7 && hit8)
-        //{
-        //    rayOrigin = originPos + new Vector2(1, -1) + new Vector2(-1, 2);
-        //    Debug.DrawRay(rayOrigin, new Vector2(-1, 2) * lenght, Color.magenta, 2);
-        //    rayOrigin = originPos + new Vector2(1, -1) + new Vector2(-2, 1);
-        //    Debug.DrawRay(rayOrigin, new Vector2(-2, 1) * lenght, Color.magenta, 2);
-        //    return true;
-        //}
-        #endregion
         cornerPos = Vector2.zero;
         return false;
     }

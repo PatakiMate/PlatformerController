@@ -30,7 +30,7 @@ public class CrawlerTestMovement : MonoBehaviour
         Distance = Vector2.Distance(transform.position, partTarget);
         if (Vector2.Distance(transform.position, partTarget) < Reached)
         {
-            Debug.LogError("REACHED: " + LastPoint.gameObject);
+            //Debug.LogError("REACHED: " + LastPoint.gameObject);
             goingVertical = !goingVertical;
             partTarget = GetNextPoint();
         }
@@ -40,7 +40,7 @@ public class CrawlerTestMovement : MonoBehaviour
             bool neg = target.position.x < transform.position.x ? true : false;
             if (neg != negativeX)
             {
-                Debug.Log("CHANGE DIRECTION X");
+                //Debug.Log("CHANGE DIRECTION X");
                 partTarget = GetNextPoint(true);
                 negativeX = neg;
             }
@@ -50,7 +50,7 @@ public class CrawlerTestMovement : MonoBehaviour
             bool neg = target.position.y < transform.position.y ? true : false;
             if (neg != negativeY)
             {
-                Debug.Log("CHANGE DIRECTION Y");
+                //Debug.Log("CHANGE DIRECTION Y");
                 partTarget = GetNextPoint(true);
                 negativeY = neg;
             }
@@ -60,7 +60,7 @@ public class CrawlerTestMovement : MonoBehaviour
     {
         corners.Clear();
         bool addingVertical = false;
-        Debug.LogError("LAST POINT: " + LastPoint.gameObject.name);
+        //Debug.LogError("LAST POINT: " + LastPoint.gameObject.name);
         foreach (GameObject corner in CornerChecker.Instance.Corners)
         {
             if (goingVertical)
@@ -68,7 +68,7 @@ public class CrawlerTestMovement : MonoBehaviour
                 if (Mathf.Abs(corner.transform.position.x - LastPoint.transform.position.x) < 0.1f)
                 {
                     corners.Add(corner);
-                    Debug.LogError("CLOSE: " + corner.name + ", " + corner.transform.position.x + "-" + LastPoint.transform.position.x);
+                    //Debug.LogError("CLOSE: " + corner.name + ", " + corner.transform.position.x + "-" + LastPoint.transform.position.x);
                 }
                 //if (corner.transform.position.x == LastPoint.transform.position.x)
                 //{
@@ -89,37 +89,19 @@ public class CrawlerTestMovement : MonoBehaviour
                 //}
             }
         }
-        //if (addingVertical)
-        //{
-        //    List<GameObject> removables = new List<GameObject>();
-        //    foreach (GameObject corner in corners)
-        //    {
-        //       if( corner.transform.position.x != LastPoint.transform.position.x)
-        //        {
-        //            removables.Add(corner);
-        //        }
-        //    }
-        //    foreach (GameObject removable in removables)
-        //    {
-        //        corners.Remove(removable);
-        //    }
-        //}
-        //if (addingVertical == false)
-        //{
         List<GameObject> removables = new List<GameObject>();
-        Debug.LogError("VERTICAL: " + goingVertical);
+        //Debug.LogError("VERTICAL: " + goingVertical);
 
 
         foreach (GameObject corner in corners)
         {
-            Debug.Log("CHECKING RAY: " + corner.name);
+            //Debug.Log("CHECKING RAY: " + corner.name);
             List<RaycastHit2D> rays = new List<RaycastHit2D>();
             bool hasRay = false;
             bool hasNoRay = false;
             for (int i = -1; i < 2; i++)
             {
                 Vector3 endPoint = corner.transform.position;
-                //Vector2 originPoint = new Vector2(LastPoint.transform.position.x + (0.2f * x), LastPoint.transform.position.y + (0.2f * y));
                 Vector3 originPoint = LastPoint.transform.position + (corner.transform.position - LastPoint.transform.position).normalized * 0.1f;
 
                 if (Mathf.Abs(originPoint.x - LastPoint.transform.position.x) > Mathf.Abs(originPoint.y - LastPoint.transform.position.y))
@@ -141,7 +123,6 @@ public class CrawlerTestMovement : MonoBehaviour
                 {
                     hasNoRay = true;
                     //Debug.Log("NO RAY: " + corner.name);
-                    //removables.Add(corner);
                 }
                 if (ray)
                 {
@@ -152,54 +133,46 @@ public class CrawlerTestMovement : MonoBehaviour
             }
             if (hasNoRay && hasRay)
             {
-                Debug.Log("SUCCESS: " + corner.name);
+                //Debug.Log("SUCCESS: " + corner.name);
             }
             else
             {
-                Debug.LogError("ADD TO REMOVABLE: " + corner.name);
+                //Debug.LogError("ADD TO REMOVABLE: " + corner.name);
                 removables.Add(corner);
-                //corners.Remove(corner);
             }
         }
         foreach (GameObject removable in removables)
         {
-            Debug.LogError("REMOVED: " + removable.name);
+            //Debug.LogError("REMOVED: " + removable.name);
             corners.Remove(removable);
         }
         removables.Clear();
 
         if (corners.Contains(LastPoint.gameObject))
         {
-            Debug.LogError("REMOVE SAME");
-            //if (!removables.Contains(LastPoint.gameObject))
-            //{
-            //    Debug.LogError("ADD TO REMOVABLE: " + LastPoint.gameObject);
-            //    //removables.Add(LastPoint.gameObject);
-            //}
+            //Debug.LogError("REMOVE SAME");
             corners.Remove(LastPoint.gameObject);
         }
         else
         {
-            Debug.LogError("RETURN SAME");
+            //Debug.LogError("RETURN SAME");
         }
-
-        Debug.LogError("CORNER COUNT: " + corners.Count + " , REMOVEABLE COUNT: " + removables.Count);
+        //Debug.LogError("CORNER COUNT: " + corners.Count + " , REMOVEABLE COUNT: " + removables.Count);
         corners = corners.OrderByDescending(element => Vector2.Distance(LastPoint.transform.position, element.transform.position)).ToList();
         if (corners.Count > 2)
         {
-            ;
-            Debug.Log("LAST: " + corners[corners.Count - 1] + " BEFORE LAST: " + corners[corners.Count - 2]);
+            //Debug.Log("LAST: " + corners[corners.Count - 1] + " BEFORE LAST: " + corners[corners.Count - 2]);
         }
         if(!goingVertical)
         {
-            Debug.LogError("CHECKING DIRECTIONS");
+            //Debug.LogError("CHECKING DIRECTIONS");
             foreach (GameObject corner in corners)
             {
                 if (target.position.x < transform.position.x && corner.transform.position.x > transform.position.x)
                 {
                     if (!removables.Contains(corner))
                     {
-                        Debug.LogError("ADD TO REMOVABLE: " + corner.name);
+                        //Debug.LogError("ADD TO REMOVABLE: " + corner.name);
                         removables.Add(corner);
                     }
                 }
@@ -207,21 +180,21 @@ public class CrawlerTestMovement : MonoBehaviour
                 {
                     if (!removables.Contains(corner))
                     {
-                        Debug.LogError("ADD TO REMOVABLE: " + corner.name);
+                        //Debug.LogError("ADD TO REMOVABLE: " + corner.name);
                         removables.Add(corner);
                     }
                 }
             }
         }
 
-        Debug.LogError("CORNER COUNT: " + corners.Count + " , REMOVEABLE COUNT: " + removables.Count);
+        //Debug.LogError("CORNER COUNT: " + corners.Count + " , REMOVEABLE COUNT: " + removables.Count);
         if (removables.Count == corners.Count)
         {
-            Debug.LogError("SAME COUNT");
+            //Debug.LogError("SAME COUNT");
             for (int i = 0; i < corners.Count - 1; i++)
             {
                 GameObject removable = removables[i];
-                Debug.LogError("REMOVED: " + removable.name);
+                //Debug.LogError("REMOVED: " + removable.name);
                 corners.Remove(removable);
             }
         }
@@ -229,13 +202,20 @@ public class CrawlerTestMovement : MonoBehaviour
         {
             foreach (GameObject removable in removables)
             {
-                Debug.LogError("REMOVED: " + removable.name);
+                //Debug.LogError("REMOVED: " + removable.name);
                 corners.Remove(removable);
             }
         }
-        corners = corners.OrderBy(element => Vector2.Distance(transform.position, element.transform.position)).ToList();
-        LastPoint = corners[0];
-        Debug.LogError("NEW POINT: " + corners[0].name);
-        return corners[0].transform.position;
+        if (corners.Count > 0)
+        {
+            corners = corners.OrderBy(element => Vector2.Distance(transform.position, element.transform.position)).ToList();
+            LastPoint = corners[0];
+            return corners[0].transform.position;
+        }  else
+        {
+            return LastPoint.transform.position;
+        }
+        //Debug.LogError("NEW POINT: " + corners[0].name);
+       
     }
 }
